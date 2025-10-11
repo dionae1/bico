@@ -1,4 +1,5 @@
-from sqlalchemy import String, ForeignKey
+from datetime import datetime
+from sqlalchemy import DateTime, String, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -16,6 +17,9 @@ class Client(Base):
     phone: Mapped[str] = mapped_column(String(11), unique=True)
     address: Mapped[str] = mapped_column(String(200))
     status: Mapped[bool] = mapped_column(default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=func.now(), server_default=func.now()
+    )
 
     # Relationships
     contracts: Mapped[list["Contract"]] = relationship(

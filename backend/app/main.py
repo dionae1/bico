@@ -8,6 +8,7 @@ from app.routes import (
     client_routes,
     service_routes,
     contract_routes,
+    dashboard_routes,
 )
 
 app = FastAPI(title="CSManager API", version="1.0.0")
@@ -33,6 +34,7 @@ v1_router.include_router(supplier_routes.router, tags=["suppliers"])
 v1_router.include_router(client_routes.router, tags=["clients"])
 v1_router.include_router(service_routes.router, tags=["services"])
 v1_router.include_router(contract_routes.router, tags=["contracts"])
+v1_router.include_router(dashboard_routes.router, tags=["dashboard"])
 
 app.include_router(v1_router)
 
