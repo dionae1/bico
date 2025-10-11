@@ -11,12 +11,27 @@ def revenue_data():
         contracts: list[Contract] = (
             db.query(Contract).filter(Contract.status == True).all()
         )
+
         services: list[Service] = db.query(Service).filter(Service.status == True).all()
 
+        services_with_contracts = [contract.service_id for contract in contracts]
+
         total_revenue: float = sum(contract.value for contract in contracts)
-        total_expected_revenue: float = sum(service.price for service in services)
-        total_cost: float = sum(service.cost for service in services)
+
+        total_expected_revenue: float = sum(
+            service.price
+            for service in services
+            if service.id in services_with_contracts
+        )
+
+        total_cost: float = sum(
+            service.cost
+            for service in services
+            if service.id in services_with_contracts
+        )
+
         net_revenue: float = total_revenue - total_cost
+
         profit_margin: float = (
             (net_revenue / total_revenue * 100) if total_revenue > 0 else 0
         )
@@ -124,7 +139,7 @@ def top_services(limit: int = 5):
                 func.sum(Contract.value).label("revenue"),
             )
             .join(Contract, Contract.service_id == Service.id)
-            .group_by(Service.id)
+            .group_by(Service.id, Service.name)
             .order_by(func.sum(Contract.value).desc())
             .limit(limit)
             .all()
