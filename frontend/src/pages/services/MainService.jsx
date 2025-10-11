@@ -42,8 +42,8 @@ function MainService() {
                 <div className="mb-4 mt-8">
                     <input
                         type="text"
-                        placeholder="Search by name"
-                        className="border border-black rounded-lg p-2 w-full"
+                        placeholder="Search by name ..."
+                        className="border-2 border-gray-300 rounded-lg p-2 w-full"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value)

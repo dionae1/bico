@@ -35,18 +35,18 @@ function NavBar() {
     };
 
     return (
-        <aside className="w-64 bg-gradient-to-b from-slate-100 via-slate-200 flex-shrink-0 flex flex-col shadow-xl sticky top-0 h-screen overflow-hidden border-r border-slate-300">
+        <aside className="w-64 bg-gradient-to-b from-slate-50 via-slate-100 flex-shrink-0 flex flex-col shadow-xl sticky top-0 h-screen overflow-hidden border-r border-slate-300">
 
             {/* Header */}
-            <div className="text-center my-6">
-                <h1 className="text-2xl text-slate-700 font-bold tracking-wide">BICO</h1>
-                <p className="text-xs text-slate-500 font-medium">Services Manager</p>
+            <div className="text-center mt-14 mb-4">
+                <h1 className="text-5xl text-slate-700 font-extrabold tracking-wider">BiCO</h1>
+                <p className="text-md text-slate-500 font-bold">Services Manager</p>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-grow px-3 mt-4">
+            <nav className="flex-grow px-2 mt-4">
                 <ul className="space-y-2">
-                    {items.map((item, i) => {
+                    {items.map((item) => {
                         const IconComponent = item.icon;
                         const isActive = location.pathname === item.path;
 
@@ -55,9 +55,9 @@ function NavBar() {
                                 <Link
                                     to={item.path}
                                     className={`
-                                        flex items-center px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
+                                        flex items-center p-3 rounded-md transition-all duration-300 group relative overflow-hidden
                                         ${isActive
-                                            ? 'bg-green-100 shadow-md border border-green-200'
+                                            ? 'bg-green-100 shadow-xs'
                                             : 'hover:bg-slate-100 hover:shadow-sm'
                                         }
                                     `}
@@ -70,16 +70,16 @@ function NavBar() {
                                         }
                                     `} />
                                     <span className={`
-                                        font-medium transition-all duration-300
+                                        font-bold
                                         ${isActive
-                                            ? 'text-emerald-700 font-semibold'
+                                            ? 'text-emerald-700'
                                             : 'text-slate-600 group-hover:text-slate-700'
                                         }
                                     `}>
                                         {item.title}
                                     </span>
                                     {isActive && (
-                                        <div className="absolute right-2 w-2 h-2 bg-emerald-500 rounded-full shadow-sm" />
+                                        <div className="absolute right-2 w-2 h-2 bg-emerald-500 rounded-full" />
                                     )}
                                 </Link>
                             </li>
