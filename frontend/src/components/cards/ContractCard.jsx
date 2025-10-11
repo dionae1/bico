@@ -44,7 +44,7 @@ function ContractCard({ contract, refreshContracts }) {
     }
 
     return (
-        <div className="border p-4 rounded-md">
+        <div className="p-4 rounded-lg w-full md:w-auto flex-1 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
             {error && <ErrorModal message={error} onClose={() => setError(null)} />}
             <div className="grid grid-cols-[1fr_auto] gap-4 mt-1 p-1">
                 <div>
