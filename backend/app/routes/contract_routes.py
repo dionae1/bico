@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.db.models import Contract
 from app.models.user import User
 from app.services import contract as contract_service
-from app.schemas.contract import ResponseContract, CreateContract, UpdateContract
+from app.schemas.contract import (
+    CompleteResponseContract,
+    ResponseContract,
+    CreateContract,
+    UpdateContract,
+)
 from app.schemas.response import ResponseSchema
 from app.core.auth import get_current_user
 from sqlalchemy.exc import IntegrityError
@@ -58,7 +63,13 @@ def get_contracts(current_user: User = Depends(get_current_user)) -> ResponseSch
     if not contracts:
         raise HTTPException(status_code=404, detail="No contracts found")
 
-    response = [ResponseContract.from_model(contract) for contract in contracts]
+    response = [
+        CompleteResponseContract.from_model(
+            item["contract"], item["client"], item["service"]
+        )
+        for item in contracts
+    ]
+
     return ResponseSchema(
         success=True,
         message="Contracts retrieved successfully",

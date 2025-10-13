@@ -28,13 +28,8 @@ function MainContract() {
         try {
             const response = await api.get("/contracts/user");
             const { data } = response.data;
-
-            await Promise.all(data.map(async (contract: any) => {
-                contract.client = await api.get(`/clients/${contract['client_id']}`).then(res => res.data.data);
-                contract.service = await api.get(`/services/${contract['service_id']}`).then(res => res.data.data);
-            }));
-
             setContracts(data);
+
         } catch (error: any) {
             if (error.response.data.message !== "No contracts found") {
                 console.error("Error fetching contracts:", error);
