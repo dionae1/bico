@@ -1,0 +1,8 @@
+#backend
+create controllers modules on backend
+create refresh token tech
+use cookies for auth
+
+#frontend
+transition to typescript
+verify input on forms

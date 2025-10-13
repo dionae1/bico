@@ -1,0 +1,20 @@
+import ServiceForm from "../../components/forms/ServiceForm";
+import BackButton from "../../components/buttons/BackButton";
+
+import { useNavigate } from "react-router-dom";
+
+function CreateService() {
+    const navigate = useNavigate();
+
+    const handleServiceCreated = () => {
+        navigate(-1);
+    };
+
+    return (
+        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg mt-10 p-10">
+            <ServiceForm onCreated={handleServiceCreated} />
+        </div>
+    );
+}
+
+export default CreateService;
