@@ -1,7 +1,8 @@
 from datetime import datetime
+
+from sqlalchemy.engine import Row
 from app.db.models import User, Service, Client, Supplier, Contract
 from app.db.session import SessionLocal
-from app.core.auth import hash_password, verify_password
 
 
 def create_contract(
@@ -27,22 +28,35 @@ def create_contract(
         return contract
 
 
-def get_contract_by_id(contract_id: int) -> Contract | None:
+def get_contract_by_id(
+    contract_id: int,
+) -> Row[tuple[Contract, Client, Service]] | None:
     with SessionLocal() as db:
-        return db.query(Contract).filter(Contract.id == contract_id).first()
+        contract = (
+            db.query(Contract, Client, Service)
+            .filter(Contract.id == contract_id)
+            .join(Client, Contract.client_id == Client.id)
+            .join(Service, Contract.service_id == Service.id)
+            .first()
+        )
+        return contract
 
 
-def get_contracts_by_client(client_id: int) -> list[Contract]:
+def get_contracts_by_client(
+    client_id: int,
+) -> list[Row[tuple[Contract, Client, Service]]]:
     with SessionLocal() as db:
-        return db.query(Contract).filter(Contract.client_id == client_id).all()
+        contracts = (
+            db.query(Contract, Client, Service)
+            .filter(Contract.client_id == client_id)
+            .join(Client, Contract.client_id == Client.id)
+            .join(Service, Contract.service_id == Service.id)
+            .all()
+        )
+        return contracts
 
 
-def get_contracts_by_service(service_id: int) -> list[Contract]:
-    with SessionLocal() as db:
-        return db.query(Contract).filter(Contract.service_id == service_id).all()
-
-
-def get_contracts_by_user(user_id: int):
+def get_contracts_by_user(user_id: int) -> list[Row[tuple[Contract, Client, Service]]]:
     with SessionLocal() as db:
         contracts = (
             db.query(Contract, Client, Service)

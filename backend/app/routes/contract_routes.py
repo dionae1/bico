@@ -86,7 +86,13 @@ def get_contracts_by_client(
     if not contracts:
         raise HTTPException(status_code=404, detail="No contracts found")
 
-    response = [ResponseContract.from_model(contract) for contract in contracts]
+    response = [
+        CompleteResponseContract.from_model(
+            item["contract"], item["client"], item["service"]
+        )
+        for item in contracts
+    ]
+
     return ResponseSchema(
         success=True,
         message="Contracts retrieved successfully",
@@ -102,8 +108,9 @@ def get_contract(
 
     if not contract:
         raise HTTPException(status_code=404, detail="Contract not found")
-
-    response = ResponseContract.from_model(contract)
+    response = CompleteResponseContract.from_model(
+        contract[0], contract[1], contract[2]
+    )
     return ResponseSchema(
         success=True,
         message="Contract retrieved successfully",

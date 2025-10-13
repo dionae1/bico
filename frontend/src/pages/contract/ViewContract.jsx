@@ -1,34 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
 import BackButton from "../../components/buttons/BackButton";
-import FormInput from "../../components/FormInput";
-import FormButton from "../../components/buttons/FormButton";
 
 import api from "../../api/client";
-import Client from "@/types/Client";
-import Service from "@/types/Service";
-
-interface Contract {
-    id: number;
-    client_id: number;
-    service_id: number;
-    created_at: string;
-    end_at: string;
-    value: number;
-    client: Client;
-    service: Service;
-}
+import FormInput from "../../components/FormInput";
 
 function ViewContract() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [contract, setContract] = useState<Contract | null>(null);
-    const [value, setValue] = useState<number | null>(null);
-    const [endAt, setEndAt] = useState<string | null>(null);
+    const [contract, setContract] = useState(null);
+    const [value, setValue] = useState("");
+    const [endAt, setEndAt] = useState("");
 
-    const isValid = (contract !== null && value !== null && endAt !== null);
+    const isValid = contract && value && endAt;
 
     const fetchContract = async () => {
         try {
@@ -38,8 +23,7 @@ function ViewContract() {
             setValue(data.value || "");
             setEndAt(data.end_at ? data.end_at.split('T')[0] : "");
             setContract(data);
-            console.log(data)
-        } catch (error: any) {
+        } catch (error) {
             if (error.response.data.message !== "No contracts found") {
                 console.error("Error fetching contracts:", error);
             }
@@ -48,7 +32,7 @@ function ViewContract() {
 
     const updateContract = async () => {
         try {
-            const response = await api.put(`/contracts/${id}`, {
+            const response = await api.put(`/contracts/${contract.id}`, {
                 value,
                 end_at: endAt
             });
@@ -59,7 +43,7 @@ function ViewContract() {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         if (isValid) {
             updateContract();
@@ -71,26 +55,22 @@ function ViewContract() {
         if (id) {
             fetchContract();
         }
-    }, []);
+    }, [id]);
 
     return (
         <div className="max-w-4xl mx-auto p-6">
             <h1 className="text-3xl font-bold mb-4">View Contract</h1>
-            <div>
-                <BackButton />
-            </div>
+            <BackButton onClick={() => navigate(-1)} />
             {isValid ? (
                 <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg my-4 flex flex-col space-y-4">
                     <h2 className="text-xl font-semibold text-gray-800 text-center">Change the info below to update the contract.</h2>
                     <FormInput
-                        id="client"
                         label="Client"
                         value={contract.client?.name || ""}
                         onChange={() => { }}
                         disable={true}
                     />
                     <FormInput
-                        id="service"
                         label="Service"
                         value={contract.service?.name || ""}
                         onChange={() => { }}
@@ -98,20 +78,20 @@ function ViewContract() {
                     />
 
                     <FormInput
-                        id="value"
                         label="Value"
-                        type="number"
                         value={value}
-                        onChange={(e) => setValue(Number(e.target.value))}
+                        onChange={(e) => setValue(e.target.value)}
                     />
                     <FormInput
-                        id="endAt"
                         label="End At"
                         type="date"
                         value={endAt}
                         onChange={(e) => setEndAt(e.target.value)}
                     />
-                    <FormButton title="Confirm Changes" onClick={handleSubmit} isValid={isValid} />
+                    <button type="submit" disabled={!isValid} className={`w-full text-white font-bold text-center text-xl p-2 rounded-md transition-colors cursor-pointer
+                ${isValid ? 'bg-green-600 hover:bg-green-500' : 'bg-gray-400 cursor-not-allowed'}`}>
+                        Confirm Changes
+                    </button>
                 </form>
             ) : (
                 <p>Loading...</p>
