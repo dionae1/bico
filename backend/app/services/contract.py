@@ -42,9 +42,23 @@ def get_contracts_by_service(service_id: int) -> list[Contract]:
         return db.query(Contract).filter(Contract.service_id == service_id).all()
 
 
-def get_contracts_by_user(user_id: int) -> list[Contract]:
+def get_contracts_by_user(user_id: int):
     with SessionLocal() as db:
-        return db.query(Contract).filter(Contract.user_id == user_id).all()
+        contracts = (
+            db.query(Contract, Client, Service)
+            .filter(Contract.user_id == user_id)
+            .join(Client, Contract.client_id == Client.id)
+            .join(Service, Contract.service_id == Service.id)
+            .all()
+        )
+
+        clients_services = []
+        for contract, client, service in contracts:
+            clients_services.append(
+                {"contract": contract, "client": client, "service": service}
+            )
+
+        return clients_services
 
 
 def update_contract(contract_id: int, **kwargs) -> Contract | None:
