@@ -12,6 +12,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 def create_user(
     user: CreateUserRequest, current_user: User = Depends(get_current_user)
 ) -> ResponseSchema:
+
     created_user = user_service.create_user(user.email, user.name, user.password)
 
     if not created_user:

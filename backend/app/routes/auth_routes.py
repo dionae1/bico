@@ -1,8 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from datetime import timedelta
+from fastapi import APIRouter, HTTPException, status
 from app.services import user as user_service
 from app.schemas.user import ResponseUser, CreateUserRequest, LoginUserRequest
-from app.models.user import User
 from app.core.auth import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -10,6 +8,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login")
 def login(user_in: LoginUserRequest):
+
     user = user_service.authenticate_user(user_in.email, user_in.password)
     if not user:
         raise HTTPException(
@@ -22,6 +21,7 @@ def login(user_in: LoginUserRequest):
 
 @router.post("/register")
 def register(user_in: CreateUserRequest):
+
     user_exists = user_service.get_user_by_email(user_in.email)
     if user_exists:
         raise HTTPException(
@@ -30,7 +30,7 @@ def register(user_in: CreateUserRequest):
 
     user = user_service.create_user(user_in.email, user_in.name, user_in.password)
     response = ResponseUser.from_model(user)
-    
+
     return {
         "success": True,
         "message": "User registered successfully",

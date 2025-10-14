@@ -30,19 +30,22 @@ def create_service(
         return service
 
 
-def get_service_by_id(service_id: int) -> Service | None:
+def get_service_by_id(service_id: int, user_id: int) -> Service | None:
     with SessionLocal() as db:
-        return db.query(Service).filter(Service.id == service_id).first()
+        return (
+            db.query(Service)
+            .filter(Service.id == service_id, Service.user_id == user_id)
+            .first()
+        )
 
 
-def get_service_by_name(name: str) -> Service | None:
+def get_service_by_name(name: str, user_id: int) -> Service | None:
     with SessionLocal() as db:
-        return db.query(Service).filter(Service.name == name).first()
-
-
-def get_all_services() -> list[Service]:
-    with SessionLocal() as db:
-        return db.query(Service).all()
+        return (
+            db.query(Service)
+            .filter(Service.name == name, Service.user_id == user_id)
+            .first()
+        )
 
 
 def get_services_by_user(user_id: int) -> list[Service]:
@@ -50,9 +53,14 @@ def get_services_by_user(user_id: int) -> list[Service]:
         return db.query(Service).filter(Service.user_id == user_id).all()
 
 
-def update_service(service_id: int, **kwargs) -> Service | None:
+def update_service(service_id: int, user_id: int, **kwargs) -> Service | None:
     with SessionLocal() as db:
-        service = db.query(Service).filter(Service.id == service_id).first()
+        service = (
+            db.query(Service)
+            .filter(Service.id == service_id, Service.user_id == user_id)
+            .first()
+        )
+
         if not service:
             return None
 
@@ -64,9 +72,14 @@ def update_service(service_id: int, **kwargs) -> Service | None:
         return service
 
 
-def delete_service(service_id: int) -> bool:
+def delete_service(service_id: int, user_id: int) -> bool:
     with SessionLocal() as db:
-        service = db.query(Service).filter(Service.id == service_id).first()
+        service = (
+            db.query(Service)
+            .filter(Service.id == service_id, Service.user_id == user_id)
+            .first()
+        )
+
         if not service:
             return False
 
@@ -75,9 +88,14 @@ def delete_service(service_id: int) -> bool:
         return True
 
 
-def toggle_service_status(service_id: int) -> Service | None:
+def toggle_service_status(service_id: int, user_id: int) -> Service | None:
     with SessionLocal() as db:
-        service = db.query(Service).filter(Service.id == service_id).first()
+        service = (
+            db.query(Service)
+            .filter(Service.id == service_id, Service.user_id == user_id)
+            .first()
+        )
+
         if not service:
             return None
 

@@ -20,6 +20,7 @@ def create_contract(
     contract: CreateContract,
     current_user: User = Depends(get_current_user),
 ) -> ResponseSchema:
+
     try:
         created_contract = contract_service.create_contract(
             user_id=current_user.id,
@@ -58,6 +59,7 @@ def create_contract(
 
 @router.get("/user", response_model=ResponseSchema)
 def get_contracts(current_user: User = Depends(get_current_user)) -> ResponseSchema:
+
     contracts = contract_service.get_contracts_by_user(current_user.id)
 
     if not contracts:
@@ -81,7 +83,10 @@ def get_contracts(current_user: User = Depends(get_current_user)) -> ResponseSch
 def get_contracts_by_client(
     client_id: int, current_user: User = Depends(get_current_user)
 ) -> ResponseSchema:
-    contracts = contract_service.get_contracts_by_client(client_id)
+
+    contracts = contract_service.get_contracts_by_client(
+        client_id=client_id, user_id=current_user.id
+    )
 
     if not contracts:
         raise HTTPException(status_code=404, detail="No contracts found")
@@ -104,10 +109,14 @@ def get_contracts_by_client(
 def get_contract(
     contract_id: int, current_user: User = Depends(get_current_user)
 ) -> ResponseSchema:
-    contract = contract_service.get_contract_by_id(contract_id)
+
+    contract = contract_service.get_contract_by_id(
+        contract_id=contract_id, user_id=current_user.id
+    )
 
     if not contract:
         raise HTTPException(status_code=404, detail="Contract not found")
+
     response = CompleteResponseContract.from_model(
         contract[0], contract[1], contract[2]
     )
@@ -122,7 +131,10 @@ def get_contract(
 def delete_contract(
     contract_id: int, current_user: User = Depends(get_current_user)
 ) -> ResponseSchema:
-    success = contract_service.delete_contract(contract_id)
+
+    success = contract_service.delete_contract(
+        contract_id=contract_id, user_id=current_user.id
+    )
 
     if not success:
         raise HTTPException(status_code=404, detail="Contract not found")
@@ -139,8 +151,10 @@ def update_contract(
     contract: UpdateContract,
     current_user: User = Depends(get_current_user),
 ) -> ResponseSchema:
+
     updated_contract = contract_service.update_contract(
-        contract_id,
+        contract_id=contract_id,
+        user_id=current_user.id,
         end_at=contract.end_at,
         value=contract.value,
     )
@@ -160,7 +174,10 @@ def update_contract(
 def toggle_contract_status(
     contract_id: int, current_user: User = Depends(get_current_user)
 ) -> ResponseSchema:
-    contract = contract_service.toggle_contract_status(contract_id)
+
+    contract = contract_service.toggle_contract_status(
+        contract_id=contract_id, user_id=current_user.id
+    )
 
     if not contract:
         raise HTTPException(status_code=404, detail="Contract not found")
