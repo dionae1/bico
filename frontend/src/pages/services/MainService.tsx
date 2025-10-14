@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react"
 import { Link } from "react-router-dom"
 
+import ServiceModal from "../../components/modals/ServiceModal"
 import ServiceCard from "../../components/cards/ServiceCard"
 import NoItems from "../../components/NoItems"
 
@@ -10,6 +11,11 @@ import Service from "@/types/Service"
 function MainService() {
     const [services, setServices] = useState<Service[]>([])
     const [searchTerm, setSearchTerm] = useState("")
+    const [serviceModal, setServiceModal] = useState(false);
+    const [highlightItem, setHighlightItem] = useState<Service | null>(null);
+
+    const openModal = () => setServiceModal(true);
+    const closeModal = () => setServiceModal(false);
 
     const fetchServices = async () => {
         try {
@@ -61,13 +67,19 @@ function MainService() {
                     <ul className="space-y-4">
 
                         {filteredServices.map(service => (
-                            <li key={service.id}>
+                            <li key={service.id}
+                                onClick={() => {
+                                    setHighlightItem(service);
+                                    openModal();
+                                }}
+                            >
                                 <ServiceCard service={service} refreshServices={fetchServices} />
                             </li>
                         ))}
 
                     </ul>
                 )}
+                <ServiceModal isOpen={serviceModal} onClose={closeModal} service={highlightItem ? highlightItem : null} />
             </div>
         </div>
     )

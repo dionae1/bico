@@ -1,6 +1,7 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, use } from "react";
 import { Link } from "react-router-dom";
 
+import ContractModal from "../../components/modals/ContractModal";
 import ContractCard from "../../components/cards/ContractCard";
 import NoItems from "../../components/NoItems";
 import api from "../../api/client";
@@ -22,6 +23,11 @@ interface Contract {
 function MainContract() {
     const [contracts, setContracts] = useState<Contract[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [contractModal, setContractModal] = useState(false);
+    const [highlightItem, setHighlightItem] = useState<Contract | null>(null);
+
+    const openModal = () => setContractModal(true);
+    const closeModal = () => setContractModal(false);
 
 
     const fetchContracts = async () => {
@@ -76,13 +82,19 @@ function MainContract() {
                     <ul className="space-y-4">
                         {filteredContracts.map(contract => (
 
-                            <li key={contract.id}>
+                            <li key={contract.id}
+                                onClick={() => {
+                                    setHighlightItem(contract);
+                                    openModal();
+                                }}
+                            >
                                 <ContractCard contract={contract} refreshContracts={fetchContracts} />
                             </li>
 
                         ))}
                     </ul>
                 )}
+                <ContractModal isOpen={contractModal} onClose={closeModal} contract={highlightItem ? highlightItem : null} />
             </div>
         </div>
     );

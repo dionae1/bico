@@ -106,7 +106,14 @@ function ViewService() {
                         onChange={(e) => setServiceCost(e.target.value)}
                         required
                     />
-                    <select name="servicePeriodicity" id="servicePeriodicity" value={servicePeriodicity} onChange={e => setServicePeriodicity(e.target.value)} required>
+                    <select
+                        name="servicePeriodicity"
+                        id="servicePeriodicity"
+                        value={servicePeriodicity}
+                        onChange={e => setServicePeriodicity(e.target.value)}
+                        required
+                        className="mb-6 p-2 border border-gray-300 rounded w-full"
+                    >
                         <option value="" disabled>Select periodicity</option>
                         <option value="one-time">One-time</option>
                         <option value="weekly">Weekly</option>
