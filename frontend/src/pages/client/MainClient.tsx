@@ -1,7 +1,8 @@
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, use } from "react";
 import { Link } from "react-router-dom";
 
+import ClientModal from "../../components/modals/ClientModal";
 import ClientCard from "../../components/cards/ClientCard";
 import NoItems from "../../components/NoItems";
 
@@ -11,6 +12,11 @@ import Client from "@/types/Client";
 function MainClient() {
     const [clients, setClients] = useState<Client[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [clientModal, setClientModal] = useState(false);
+    const [highlightItem, setHighlightItem] = useState<Client | null>(null)
+
+    const openModal = () => setClientModal(true);
+    const closeModal = () => setClientModal(false);
 
     const fetchClients = async () => {
         try {
@@ -65,13 +71,19 @@ function MainClient() {
                     <ul className="space-y-4">
                         {filteredClients.map(client => (
 
-                            <li key={client.id}>
+                            <li key={client.id}
+                                onClick={() => {
+                                    setHighlightItem(client);
+                                    openModal();
+                                }}
+                            >
                                 <ClientCard client={client} refreshClients={fetchClients} />
                             </li>
 
                         ))}
                     </ul>
                 )}
+                <ClientModal isOpen={clientModal} onClose={closeModal} client={highlightItem ? highlightItem : null} />
             </div>
         </div>
     );
