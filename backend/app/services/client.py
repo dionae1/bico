@@ -21,30 +21,46 @@ def create_client(
         return client
 
 
-def get_client_by_id(client_id: int) -> Client | None:
+def get_client_by_id(client_id: int, user_id: int) -> Client | None:
     with SessionLocal() as db:
-        return db.query(Client).filter(Client.id == client_id).first()
+        return (
+            db.query(Client)
+            .filter(Client.id == client_id, Client.user_id == user_id)
+            .first()
+        )
 
 
-def get_client_by_name(name: str) -> list[Client] | None:
+def get_client_by_name(name: str, user_id: int) -> list[Client] | None:
     with SessionLocal() as db:
-        return db.query(Client).filter(Client.name == name).all()
+        return (
+            db.query(Client)
+            .filter(Client.name == name, Client.user_id == user_id)
+            .all()
+        )
 
 
-def get_client_by_email(email: str) -> Client | None:
+def get_client_by_email(email: str, user_id: int) -> Client | None:
     with SessionLocal() as db:
-        return db.query(Client).filter(Client.email == email).first()
+        return (
+            db.query(Client)
+            .filter(Client.email == email, Client.user_id == user_id)
+            .first()
+        )
 
 
-def get_all_clients(user_id: int) -> list[Client]:
+def get_client_by_user(user_id: int) -> list[Client]:
     with SessionLocal() as db:
         return db.query(Client).filter(Client.user_id == user_id).all()
-        return db.query(Client).all()
 
 
-def update_client(client_id: int, **kwargs) -> Client | None:
+def update_client(client_id: int, user_id: int, **kwargs) -> Client | None:
     with SessionLocal() as db:
-        client = db.query(Client).filter(Client.id == client_id).first()
+        client = (
+            db.query(Client)
+            .filter(Client.id == client_id, Client.user_id == user_id)
+            .first()
+        )
+
         if not client:
             return None
 
@@ -56,9 +72,14 @@ def update_client(client_id: int, **kwargs) -> Client | None:
         return client
 
 
-def delete_client(client_id: int) -> bool:
+def delete_client(client_id: int, user_id: int) -> bool:
     with SessionLocal() as db:
-        client = db.query(Client).filter(Client.id == client_id).first()
+        client = (
+            db.query(Client)
+            .filter(Client.id == client_id, Client.user_id == user_id)
+            .first()
+        )
+
         if not client:
             return False
 
@@ -67,9 +88,13 @@ def delete_client(client_id: int) -> bool:
         return True
 
 
-def toggle_client_status(client_id: int) -> Client | None:
+def toggle_client_status(client_id: int, user_id: int) -> Client | None:
     with SessionLocal() as db:
-        client = db.query(Client).filter(Client.id == client_id).first()
+        client = (
+            db.query(Client)
+            .filter(Client.id == client_id, Client.user_id == user_id)
+            .first()
+        )
         if not client:
             return None
 

@@ -18,6 +18,7 @@ router = APIRouter(prefix="/services", tags=["services"])
 def create_service(
     service: CreateServiceRequest, current_user: User = Depends(get_current_user)
 ) -> ResponseSchema:
+
     created_service = services_.create_service(
         user_id=current_user.id,
         name=service.name,
@@ -42,6 +43,7 @@ def create_service(
 
 @router.get("/", response_model=ResponseSchema)
 def get_services(current_user: User = Depends(get_current_user)) -> ResponseSchema:
+
     services = services_.get_services_by_user(user_id=current_user.id)
     if not services:
         raise HTTPException(
@@ -60,7 +62,10 @@ def get_services(current_user: User = Depends(get_current_user)) -> ResponseSche
 def get_service(
     service_id: int, current_user: User = Depends(get_current_user)
 ) -> ResponseSchema:
-    service = services_.get_service_by_id(service_id=service_id)
+
+    service = services_.get_service_by_id(
+        service_id=service_id, user_id=current_user.id
+    )
     if not service:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Service not found"
@@ -80,8 +85,10 @@ def update_service(
     service: UpdateServiceRequest,
     current_user: User = Depends(get_current_user),
 ) -> ResponseSchema:
+
     updated_service = services_.update_service(
         service_id=service_id,
+        user_id=current_user.id,
         name=service.name,
         description=service.description,
         price=service.price,
@@ -105,13 +112,10 @@ def update_service(
 def toggle_service_status(
     service_id: int, current_user: User = Depends(get_current_user)
 ) -> ResponseSchema:
-    service = services_.get_service_by_id(service_id=service_id)
-    if not service:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Service not found"
-        )
 
-    toggled_service = services_.toggle_service_status(service_id=service_id)
+    toggled_service = services_.toggle_service_status(
+        service_id=service_id, user_id=current_user.id
+    )
     if not toggled_service:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -132,12 +136,14 @@ def delete_service(
 ) -> ResponseSchema:
 
     try:
-        success = services_.delete_service(service_id=service_id)
+        success = services_.delete_service(
+            service_id=service_id, user_id=current_user.id
+        )
 
     except IntegrityError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete service due to existing contracts",
+            detail="Cannot delete service due to existing dependencies",
         )
 
     except Exception as e:
