@@ -5,7 +5,7 @@ function FormButton({ title, onClick, isValid = true }: { title: string; onClick
     return (
         <button
             onClick={onClick}
-            className={`w-1/5 m-auto py-2 text-white rounded-md transition-colors duration-75 ${isValid ? validStyle : invalidStyle}`}
+            className={`min-w-1/5 m-auto py-2 text-white rounded-md transition-colors duration-75 ${isValid ? validStyle : invalidStyle}`}
             disabled={!isValid}
         >
             <div className="flex items-center justify-center">

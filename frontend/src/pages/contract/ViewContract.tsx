@@ -25,35 +25,37 @@ function ViewContract() {
     const navigate = useNavigate();
 
     const [contract, setContract] = useState<Contract | null>(null);
+    const [client, setClient] = useState<Client | null>(null);
+    const [service, setService] = useState<Service | null>(null);
     const [value, setValue] = useState<number | null>(null);
     const [endAt, setEndAt] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const isValid = (contract !== null && value !== null && endAt !== null);
 
-    const fetchContract = async () => {
-        try {
+    useEffect(() => {
+        const fetchContract = async () => {
+            setLoading(true);
             const response = await api.get(`/contracts/${id}`);
-            const { data } = response.data;
-
-            setValue(data.value || "");
-            setEndAt(data.end_at ? data.end_at.split('T')[0] : "");
-            setContract(data);
-            console.log(data)
-        } catch (error: any) {
-            if (error.response.data.message !== "No contracts found") {
-                console.error("Error fetching contracts:", error);
-            }
-        }
-    };
-
-    const updateContract = async () => {
-        try {
-            const response = await api.put(`/contracts/${id}`, {
-                value,
-                end_at: endAt
-            });
-
             setContract(response.data);
+            setClient(response.data.client);
+            setService(response.data.service);
+            setLoading(false);
+        };
+        fetchContract();
+    }, [id]);
+
+    const handleUpdate = async () => {
+        try {
+            setLoading(true);
+            const response = await api.put(`/contracts/${id}`, {
+                end_at: contract?.end_at,
+                value: contract?.value,
+            });
+            setContract(response.data);
+            setClient(response.data.client);
+            setService(response.data.service);
+            setLoading(false);
         } catch (error) {
             console.error("Error updating contract:", error);
         }
@@ -62,16 +64,10 @@ function ViewContract() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isValid) {
-            updateContract();
+            handleUpdate();
             navigate("/contracts");
         }
     };
-
-    useEffect(() => {
-        if (id) {
-            fetchContract();
-        }
-    }, []);
 
     return (
         <div className="max-w-4xl mx-auto p-6">

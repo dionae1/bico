@@ -26,7 +26,7 @@ function ClientCard({ client, refreshClients }: { client: Client; refreshClients
             })
             .catch((error) => {
                 if (error.response && error.response.data) {
-                    setError(error.response.data.message);
+                    setError(error.response.data.detail);
                 }
             });
     }
@@ -39,21 +39,31 @@ function ClientCard({ client, refreshClients }: { client: Client; refreshClients
     }
 
     return (
-        <div className="p-4 rounded-lg w-full md:w-auto flex-1 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="p-4 rounded-lg w-full md:w-auto flex-1 border border-gray-200 shadow-sm hover:shadow-lg hover:cursor-pointer transition-shadow duration-75">
             {error && <ErrorModal message={error} onClose={() => setError(null)} />}
             <div className="grid grid-cols-[1fr_auto] gap-4 mt-1 p-1">
                 <div>
-                    <h3 className="text-lg font-semibold">{client.name}</h3>
-                    <p className="text-sm text-gray-600">Email: {client.email}</p>
-                    <p className="text-sm text-gray-600">Phone: {formatPhoneNumber(client.phone)}</p>
-                    <p className="text-sm text-gray-600">Address: {client.address}</p>
+                    <h3 className="text-xl font-semibold">{client.name}</h3>
+                    <p className="text-lg text-gray-600">Email: {client.email}</p>
+                    <p className="text-lg text-gray-600">Phone: {formatPhoneNumber(client.phone)}</p>
                 </div>
 
                 <div className="flex space-y-4 justify-end flex-col">
-                    <button onClick={handleView} className="text-white text-center text-xl bg-gray-700 p-2 rounded-md hover:bg-gray-800 transition-colors cursor-pointer w-10 flex items-center justify-center">
+                    <button
+                        className="text-white text-center text-xl bg-gray-700 p-2 rounded-md hover:bg-gray-800 transition-colors cursor-pointer w-10 flex items-center justify-center"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleView();
+                        }}>
                         <FaEdit />
                     </button>
-                    <button onClick={openModal} className="text-white font-bold text-center text-xl bg-red-500 p-2 rounded-md hover:bg-red-800 transition-colors cursor-pointer w-10 flex items-center justify-center">
+
+                    <button
+                        className="text-white font-bold text-center text-xl bg-red-500 p-2 rounded-md hover:bg-red-800 transition-colors cursor-pointer w-10 flex items-center justify-center"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            openModal();
+                        }}>
                         <FaDeleteLeft />
                     </button>
 

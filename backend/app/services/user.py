@@ -39,6 +39,7 @@ def delete_user(user_id: int) -> bool:
             return True
         return False
 
+
 def update_user(user_id: int, **kwargs) -> User | None:
     with SessionLocal() as db:
         user = db.query(User).filter(User.id == user_id).first()
@@ -46,13 +47,13 @@ def update_user(user_id: int, **kwargs) -> User | None:
             return None
 
         # Handle password hashing specially
-        if 'password' in kwargs:
-            kwargs['hashed_password'] = hash_password(kwargs.pop('password'))
+        if "password" in kwargs:
+            kwargs["hashed_password"] = hash_password(kwargs.pop("password"))
 
         for key, value in kwargs.items():
             if hasattr(user, key) and value is not None:
                 setattr(user, key, value)
-                
+
         db.commit()
         db.refresh(user)
         return user
