@@ -26,7 +26,7 @@ function ClientCard({ client, refreshClients }: { client: Client; refreshClients
             })
             .catch((error) => {
                 if (error.response && error.response.data) {
-                    setError(error.response.data.message);
+                    setError(error.response.data.detail);
                 }
             });
     }

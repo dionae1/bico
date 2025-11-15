@@ -33,11 +33,10 @@ function MainContract() {
     const fetchContracts = async () => {
         try {
             const response = await api.get("/contracts/user");
-            const { data } = response.data;
-            setContracts(data);
+            setContracts(response.data);
 
         } catch (error: any) {
-            if (error.response.data.message !== "No contracts found") {
+            if (error.response.data.detail !== "No contracts found") {
                 console.error("Error fetching contracts:", error);
             }
         }

@@ -20,12 +20,9 @@ function MainService() {
     const fetchServices = async () => {
         try {
             const response = await api.get("/services")
-            const { data } = response.data
-            setServices(data)
-        } catch (error: any) {
-            if (error.response.data.message !== "No services found") {
-                console.error("Error fetching services:", error)
-            }
+            setServices(response.data);
+        } catch (error) {
+            console.error("Error fetching services:", error);
         }
     }
 

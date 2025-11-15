@@ -22,34 +22,27 @@ function ContractForm({ onCreated }: { onCreated?: () => void }) {
     const isValid = (clientId !== "" && serviceId !== "" && created_at !== "" && end_at !== "" && value !== "");
 
     useEffect(() => {
-        const fetchServices = async () => {
-            try {
+        try {
+            const fetchServices = async () => {
                 const response = await api.get("/services/");
-                const { data } = response.data;
-                setServices(data);
-            } catch (error: any) {
-                if (error.response.data.message !== "No services found") {
-                    console.error("Error fetching services:", error);
-                }
-            }
-        };
-        fetchServices();
+                setServices(response.data);
+            };
+            fetchServices();
+        } catch (error) {
+            console.error("Error fetching services:", error);
+        }
     }, []);
 
     useEffect(() => {
-        const fetchClients = async () => {
-            try {
+        try {
+            const fetchClients = async () => {
                 const response = await api.get("/clients/");
-                const { data } = response.data;
-                setClients(data);
-
-            } catch (error: any) {
-                if (error.response.data.message !== "No clients found") {
-                    console.error("Error fetching clients:", error);
-                }
-            }
-        };
-        fetchClients();
+                setClients(response.data);
+            };
+            fetchClients();
+        } catch (error) {
+            console.error("Error fetching clients:", error);
+        }
     }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

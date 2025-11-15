@@ -1,15 +1,17 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from app.core.auth import get_current_user
 import app.services.dashboard as ds
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 
-@router.get("/")
+@router.get("/", status_code=status.HTTP_200_OK)
 def get_dashboard(current_user=Depends(get_current_user)):
-    return {"data": ds.overview(current_user.id)}
+    response = ds.overview(current_user.id)
+    return response
 
 
-@router.get("/top-services/")
+@router.get("/top-services/", status_code=status.HTTP_200_OK)
 def get_top_services(limit: int = 5, current_user=Depends(get_current_user)):
-    return {"data": ds.top_services(limit=limit, user_id=current_user.id)}
+    response = ds.top_services(limit=limit, user_id=current_user.id)
+    return response

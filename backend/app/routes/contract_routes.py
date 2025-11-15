@@ -8,18 +8,17 @@ from app.schemas.contract import (
     CreateContract,
     UpdateContract,
 )
-from app.schemas.response import ResponseSchema
 from app.core.auth import get_current_user
 from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(prefix="/contracts", tags=["contracts"])
 
 
-@router.post("/", response_model=ResponseSchema)
+@router.post("/", response_model=ResponseContract, status_code=status.HTTP_201_CREATED)
 def create_contract(
     contract: CreateContract,
     current_user: User = Depends(get_current_user),
-) -> ResponseSchema:
+) -> ResponseContract:
 
     try:
         created_contract = contract_service.create_contract(
@@ -50,15 +49,17 @@ def create_contract(
         )
 
     response = ResponseContract.from_model(created_contract)
-    return ResponseSchema(
-        success=True,
-        message="Contract created successfully",
-        data=response,
-    )
+    return response
 
 
-@router.get("/user", response_model=ResponseSchema)
-def get_contracts(current_user: User = Depends(get_current_user)) -> ResponseSchema:
+@router.get(
+    "/user",
+    response_model=list[CompleteResponseContract],
+    status_code=status.HTTP_200_OK,
+)
+def get_contracts(
+    current_user: User = Depends(get_current_user),
+) -> list[CompleteResponseContract]:
 
     contracts = contract_service.get_contracts_by_user(current_user.id)
 
@@ -72,17 +73,17 @@ def get_contracts(current_user: User = Depends(get_current_user)) -> ResponseSch
         for item in contracts
     ]
 
-    return ResponseSchema(
-        success=True,
-        message="Contracts retrieved successfully",
-        data=response,
-    )
+    return response
 
 
-@router.get("/client/{client_id}", response_model=ResponseSchema)
+@router.get(
+    "/client/{client_id}",
+    response_model=list[CompleteResponseContract],
+    status_code=status.HTTP_200_OK,
+)
 def get_contracts_by_client(
     client_id: int, current_user: User = Depends(get_current_user)
-) -> ResponseSchema:
+) -> list[CompleteResponseContract]:
 
     contracts = contract_service.get_contracts_by_client(
         client_id=client_id, user_id=current_user.id
@@ -98,17 +99,17 @@ def get_contracts_by_client(
         for item in contracts
     ]
 
-    return ResponseSchema(
-        success=True,
-        message="Contracts retrieved successfully",
-        data=response,
-    )
+    return response
 
 
-@router.get("/{contract_id}", response_model=ResponseSchema)
+@router.get(
+    "/{contract_id}",
+    response_model=CompleteResponseContract,
+    status_code=status.HTTP_200_OK,
+)
 def get_contract(
     contract_id: int, current_user: User = Depends(get_current_user)
-) -> ResponseSchema:
+) -> CompleteResponseContract:
 
     contract = contract_service.get_contract_by_id(
         contract_id=contract_id, user_id=current_user.id
@@ -120,17 +121,15 @@ def get_contract(
     response = CompleteResponseContract.from_model(
         contract[0], contract[1], contract[2]
     )
-    return ResponseSchema(
-        success=True,
-        message="Contract retrieved successfully",
-        data=response,
-    )
+    return response
 
 
-@router.delete("/{contract_id}")
+@router.delete(
+    "/{contract_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
+)
 def delete_contract(
     contract_id: int, current_user: User = Depends(get_current_user)
-) -> ResponseSchema:
+) -> None:
 
     success = contract_service.delete_contract(
         contract_id=contract_id, user_id=current_user.id
@@ -139,18 +138,17 @@ def delete_contract(
     if not success:
         raise HTTPException(status_code=404, detail="Contract not found")
 
-    return ResponseSchema(
-        success=True,
-        message="Contract deleted successfully",
-    )
+    return None
 
 
-@router.put("/{contract_id}", response_model=ResponseSchema)
+@router.put(
+    "/{contract_id}", response_model=ResponseContract, status_code=status.HTTP_200_OK
+)
 def update_contract(
     contract_id: int,
     contract: UpdateContract,
     current_user: User = Depends(get_current_user),
-) -> ResponseSchema:
+) -> ResponseContract:
 
     updated_contract = contract_service.update_contract(
         contract_id=contract_id,
@@ -163,17 +161,17 @@ def update_contract(
         raise HTTPException(status_code=404, detail="Contract not found")
 
     response = ResponseContract.from_model(updated_contract)
-    return ResponseSchema(
-        success=True,
-        message="Contract updated successfully",
-        data=response,
-    )
+    return response
 
 
-@router.patch("/{contract_id}/toggle-status", response_model=ResponseSchema)
+@router.patch(
+    "/{contract_id}/toggle-status",
+    response_model=ResponseContract,
+    status_code=status.HTTP_200_OK,
+)
 def toggle_contract_status(
     contract_id: int, current_user: User = Depends(get_current_user)
-) -> ResponseSchema:
+) -> ResponseContract:
 
     contract = contract_service.toggle_contract_status(
         contract_id=contract_id, user_id=current_user.id
@@ -183,8 +181,4 @@ def toggle_contract_status(
         raise HTTPException(status_code=404, detail="Contract not found")
 
     response = ResponseContract.from_model(contract)
-    return ResponseSchema(
-        success=True,
-        message="Contract status toggled successfully",
-        data=response,
-    )
+    return response

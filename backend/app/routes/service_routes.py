@@ -1,23 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from app.db.models import Service
 from app.models.user import User
 from app.services import service as services_
+from app.core.auth import get_current_user
 from app.schemas.service import (
     ResponseService,
     CreateServiceRequest,
     UpdateServiceRequest,
 )
-from app.schemas.response import ResponseSchema
-from app.core.auth import get_current_user
 
 router = APIRouter(prefix="/services", tags=["services"])
 
 
-@router.post("/", response_model=ResponseSchema)
+@router.post("/", response_model=ResponseService, status_code=status.HTTP_201_CREATED)
 def create_service(
     service: CreateServiceRequest, current_user: User = Depends(get_current_user)
-) -> ResponseSchema:
+) -> ResponseService:
 
     created_service = services_.create_service(
         user_id=current_user.id,
@@ -34,15 +32,13 @@ def create_service(
         )
 
     response = ResponseService.from_model(created_service)
-    return ResponseSchema(
-        success=True,
-        message="Service created successfully",
-        data=response,
-    )
+    return response
 
 
-@router.get("/", response_model=ResponseSchema)
-def get_services(current_user: User = Depends(get_current_user)) -> ResponseSchema:
+@router.get("/", response_model=list[ResponseService], status_code=status.HTTP_200_OK)
+def get_services(
+    current_user: User = Depends(get_current_user),
+) -> list[ResponseService]:
 
     services = services_.get_services_by_user(user_id=current_user.id)
     if not services:
@@ -51,17 +47,15 @@ def get_services(current_user: User = Depends(get_current_user)) -> ResponseSche
         )
 
     response = [ResponseService.from_model(service) for service in services]
-    return ResponseSchema(
-        success=True,
-        message="Services retrieved successfully",
-        data=response,
-    )
+    return response
 
 
-@router.get("/{service_id}", response_model=ResponseSchema)
+@router.get(
+    "/{service_id}", response_model=ResponseService, status_code=status.HTTP_200_OK
+)
 def get_service(
     service_id: int, current_user: User = Depends(get_current_user)
-) -> ResponseSchema:
+) -> ResponseService:
 
     service = services_.get_service_by_id(
         service_id=service_id, user_id=current_user.id
@@ -72,19 +66,17 @@ def get_service(
         )
 
     response = ResponseService.from_model(service)
-    return ResponseSchema(
-        success=True,
-        message="Service retrieved successfully",
-        data=response,
-    )
+    return response
 
 
-@router.put("/{service_id}", response_model=ResponseSchema)
+@router.put(
+    "/{service_id}", response_model=ResponseService, status_code=status.HTTP_200_OK
+)
 def update_service(
     service_id: int,
     service: UpdateServiceRequest,
     current_user: User = Depends(get_current_user),
-) -> ResponseSchema:
+) -> ResponseService:
 
     updated_service = services_.update_service(
         service_id=service_id,
@@ -101,17 +93,17 @@ def update_service(
         )
 
     response = ResponseService.from_model(updated_service)
-    return ResponseSchema(
-        success=True,
-        message="Service updated successfully",
-        data=response,
-    )
+    return response
 
 
-@router.patch("/{service_id}/toggle-status", response_model=ResponseSchema)
+@router.patch(
+    "/{service_id}/toggle-status",
+    response_model=ResponseService,
+    status_code=status.HTTP_200_OK,
+)
 def toggle_service_status(
     service_id: int, current_user: User = Depends(get_current_user)
-) -> ResponseSchema:
+) -> ResponseService:
 
     toggled_service = services_.toggle_service_status(
         service_id=service_id, user_id=current_user.id
@@ -123,17 +115,15 @@ def toggle_service_status(
         )
 
     response = ResponseService.from_model(toggled_service)
-    return ResponseSchema(
-        success=True,
-        message="Service status toggled successfully",
-        data=response,
-    )
+    return response
 
 
-@router.delete("/{service_id}", response_model=ResponseSchema)
+@router.delete(
+    "/{service_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
+)
 def delete_service(
     service_id: int, current_user: User = Depends(get_current_user)
-) -> ResponseSchema:
+) -> None:
 
     try:
         success = services_.delete_service(
@@ -157,7 +147,4 @@ def delete_service(
             status_code=status.HTTP_404_NOT_FOUND, detail="Service not found"
         )
 
-    return ResponseSchema(
-        success=True,
-        message="Service deleted successfully",
-    )
+    return None

@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useMemo, use } from "react";
 import { Link } from "react-router-dom";
 
@@ -21,12 +20,9 @@ function MainClient() {
     const fetchClients = async () => {
         try {
             const response = await api.get("/clients");
-            const { data } = response.data;
-            setClients(data);
-        } catch (error: any) {
-            if (error.response.data.message !== "No clients found") {
-                console.error("Error fetching clients:", error);
-            }
+            setClients(response.data);
+        } catch (error) {
+            console.error("Error fetching clients:", error);
         }
     };
 
@@ -41,7 +37,6 @@ function MainClient() {
     useEffect(() => {
         fetchClients();
     }, []);
-
 
     return (
         <div className="max-w-4xl mx-auto p-6">
