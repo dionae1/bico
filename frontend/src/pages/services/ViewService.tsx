@@ -6,13 +6,13 @@ import FormButton from "../../components/buttons/FormButton";
 import FormInput from "../../components/FormInput";
 
 import api from "../../api/client";
-import Service from "@/types/Service";
 
 function ViewService() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [service, setService] = useState<Service | null>(null);
+    const [loading, setLoading] = useState(true);
+
     const [serviceName, setServiceName] = useState("");
     const [serviceDescription, setServiceDescription] = useState("");
     const [servicePrice, setServicePrice] = useState("");
@@ -23,22 +23,25 @@ function ViewService() {
 
     const fetchService = async () => {
         try {
+            setLoading(true);
             const response = await api.get(`/services/${id}`);
-            const { data } = response.data;
-            setService(data);
+            const { data } = response;
 
             setServiceName(data.name || "");
             setServiceDescription(data.description || "");
             setServicePrice(data.price || "");
             setServiceCost(data.cost || "");
             setServicePeriodicity(data.periodicity || "");
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching service:", error);
+            setLoading(false);
         }
     }
 
     const updateService = async () => {
         try {
+            setLoading(true);
             const response = await api.put(`/services/${id}`, {
                 name: serviceName,
                 description: serviceDescription,
@@ -46,8 +49,10 @@ function ViewService() {
                 cost: serviceCost,
                 periodicity: servicePeriodicity
             });
+            setLoading(false);
         } catch (error) {
             console.error("Error updating service:", error);
+            setLoading(false);
         }
     }
 
@@ -66,7 +71,7 @@ function ViewService() {
         }
     }, [id]);
 
-    if (!service) return <p>Loading...</p>;
+    if (loading) return <p>Loading...</p>;
 
     return (
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg mt-10 p-10">

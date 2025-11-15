@@ -10,32 +10,36 @@ import api from "../../api/client";
 
 function Dashboard() {
     const [data, setData] = useState(null);
+    const [topServices, setTopServices] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             const response = await api.get("/dashboard");
+            setData(response.data);
             const topServices = await api.get("/dashboard/top-services/?limit=3");
-            setData({ ...response.data, top_services: topServices.data });
+            setTopServices(topServices.data);
+            setLoading(false);
         };
         fetchData();
     }, []);
 
-    if (!data) {
+    if (!data || loading) {
         return <div>Loading...</div>;
     }
 
     return (
         <div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4">
-                <RevenueOverview data={data["data"]["revenue"]} />
-                <ClientsOverview data={data["data"]["clients"]} />
-                <ContractOverview data={data["data"]["contracts"]} />
+                <RevenueOverview data={data["revenue"]} />
+                <ClientsOverview data={data["clients"]} />
+                <ContractOverview data={data["contracts"]} />
             </div>
             <div className="mb-4 p-4">
-                <ServicesOverview data={data["top_services"]["data"]} />
+                <ServicesOverview data={topServices} />
             </div>
             <div className="mb-4 p-4">
-                <ContractsOverview data={data["data"]["contracts"]["next_to_expire"]} />
+                <ContractsOverview data={data["contracts"]["next_to_expire"]} />
             </div>
         </div>
     );

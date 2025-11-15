@@ -17,7 +17,7 @@ function HomePage() {
     useEffect(() => {
         const fetchData = async () => {
             const response = await api.get("/users/me");
-            setUser(response.data.data);
+            setUser(response.data);
             setLoading(false);
         };
         fetchData();

@@ -18,15 +18,13 @@ function ViewContract() {
     const fetchContract = async () => {
         try {
             const response = await api.get(`/contracts/${id}`);
-            const { data } = response.data;
+            const { data } = response;
 
             setValue(data.value || "");
             setEndAt(data.end_at ? data.end_at.split('T')[0] : "");
             setContract(data);
         } catch (error) {
-            if (error.response.data.message !== "No contracts found") {
-                console.error("Error fetching contracts:", error);
-            }
+            console.error("Error fetching contracts:", error);
         }
     };
 

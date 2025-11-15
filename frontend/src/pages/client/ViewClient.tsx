@@ -6,13 +6,13 @@ import FormButton from "../../components/buttons/FormButton";
 import FormInput from "../../components/FormInput";
 
 import api from "../../api/client";
-import Client from "@/types/Client";
 
 function ViewClient() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [client, setClient] = useState<Client | null>(null);
+    const [loading, setLoading] = useState(true);
+
     const [clientName, setClientName] = useState<string>("");
     const [clientEmail, setClientEmail] = useState<string>("");
     const [clientPhone, setClientPhone] = useState<string>("");
@@ -20,31 +20,31 @@ function ViewClient() {
 
     const isValid = (clientName !== "" && clientEmail !== "" && clientPhone !== "" && clientAddress !== "");
 
-    const fetchClient = async () => {
-        try {
-            const response = await api.get(`/clients/${id}`);
-            const { data } = response.data;
+    useEffect(() => {
+        const fetchClient = async () => {
+            setLoading(true);
+            const { data } = await api.get(`/clients/${id}`);
 
-            setClient(data);
-            setClientName(data?.name || "");
-            setClientEmail(data?.email || "");
-            setClientPhone(data?.phone || "");
-            setClientAddress(data?.address || "");
-        } catch (error) {
-            console.error("Error fetching client:", error);
-        }
-    };
+            setClientName(data.name || "");
+            setClientEmail(data.email || "");
+            setClientPhone(data.phone || "");
+            setClientAddress(data.address || "");
 
-    const updateClient = async () => {
+            setLoading(false);
+        };
+        fetchClient();
+    }, []);
+
+    const handleUpdate = async () => {
         try {
+            setLoading(true);
             const response = await api.put(`/clients/${id}`, {
                 name: clientName,
                 email: clientEmail,
                 phone: clientPhone,
-                address: clientAddress
+                address: clientAddress,
             });
-
-            setClient(response.data);
+            setLoading(false);
         } catch (error) {
             console.error("Error updating client:", error);
         }
@@ -54,18 +54,12 @@ function ViewClient() {
         e.preventDefault();
 
         if (isValid) {
-            updateClient();
+            handleUpdate();
             navigate("/clients");
         }
     };
 
-    useEffect(() => {
-        if (id) {
-            fetchClient();
-        }
-    }, [id]);
-
-    if (!client) return <div>Loading...</div>;
+    if (loading) return <div>Loading...</div>;
 
     return (
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg mt-10 p-10">
