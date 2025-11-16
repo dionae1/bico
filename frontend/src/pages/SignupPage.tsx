@@ -48,10 +48,8 @@ function SignupPage() {
 
         try {
             const response = await register(name, email, password);
-
-            if (response["success"] === true) {
+            if (response.status === 201) {
                 const loginSuccess = await login(email, password);
-
                 if (loginSuccess) {
                     navigate("/home");
                 }
