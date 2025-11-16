@@ -93,7 +93,8 @@ def update_contract(
 
     if contract:
         for key, value in kwargs.items():
-            setattr(contract, key, value)
+            if hasattr(contract, key) and value is not None:
+                setattr(contract, key, value)
 
         db.commit()
         db.refresh(contract)

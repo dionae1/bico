@@ -68,5 +68,5 @@ class CreateContract(BaseModel):
 
 
 class UpdateContract(BaseModel):
-    end_at: datetime
-    value: float
+    end_at: datetime | None = None
+    value: float | None = None

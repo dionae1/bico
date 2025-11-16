@@ -41,7 +41,6 @@ def update_user(user_id: int, db: Session, **kwargs) -> User | None:
     if not user:
         return None
 
-    # Handle password hashing specially
     if "password" in kwargs:
         kwargs["hashed_password"] = hash_password(kwargs.pop("password"))
 
