@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.engine import Row
 from app.db.models import User, Service, Client, Supplier, Contract
-from app.db.session import SessionLocal
+from sqlalchemy.orm import Session
 
 
 def create_contract(
@@ -12,118 +12,122 @@ def create_contract(
     created_at: datetime,
     end_at: datetime,
     value: float,
+    db: Session,
 ) -> Contract:
-    with SessionLocal() as db:
-        contract = Contract(
-            user_id=user_id,
-            service_id=service_id,
-            client_id=client_id,
-            created_at=created_at,
-            end_at=end_at,
-            value=value,
-        )
-        db.add(contract)
-        db.commit()
-        db.refresh(contract)
-        return contract
+
+    contract = Contract(
+        user_id=user_id,
+        service_id=service_id,
+        client_id=client_id,
+        created_at=created_at,
+        end_at=end_at,
+        value=value,
+    )
+    db.add(contract)
+    db.commit()
+    db.refresh(contract)
+    return contract
 
 
 def get_contract_by_id(
-    contract_id: int, user_id: int
+    contract_id: int, user_id: int, db: Session
 ) -> Row[tuple[Contract, Client, Service]] | None:
-    with SessionLocal() as db:
-        contract = (
-            db.query(Contract, Client, Service)
-            .filter(Contract.id == contract_id, Contract.user_id == user_id)
-            .join(Client, Contract.client_id == Client.id)
-            .join(Service, Contract.service_id == Service.id)
-            .first()
+
+    contract = (
+        db.query(Contract, Client, Service)
+        .filter(Contract.id == contract_id, Contract.user_id == user_id)
+        .join(Client, Contract.client_id == Client.id)
+        .join(Service, Contract.service_id == Service.id)
+        .first()
+    )
+    return contract
+
+
+def get_contracts_by_client(client_id: int, user_id: int, db: Session) -> list[dict]:
+
+    contracts = (
+        db.query(Contract, Client, Service)
+        .filter(Contract.client_id == client_id, Contract.user_id == user_id)
+        .join(Client, Contract.client_id == Client.id)
+        .join(Service, Contract.service_id == Service.id)
+        .all()
+    )
+
+    clients_services = []
+    for contract, client, service in contracts:
+        clients_services.append(
+            {"contract": contract, "client": client, "service": service}
         )
+
+    return clients_services
+
+
+def get_contracts_by_user(user_id: int, db: Session) -> list[dict]:
+
+    contracts = (
+        db.query(Contract, Client, Service)
+        .filter(Contract.user_id == user_id)
+        .join(Client, Contract.client_id == Client.id)
+        .join(Service, Contract.service_id == Service.id)
+        .all()
+    )
+
+    clients_services = []
+    for contract, client, service in contracts:
+        clients_services.append(
+            {"contract": contract, "client": client, "service": service}
+        )
+
+    return clients_services
+
+
+def update_contract(
+    contract_id: int, user_id: int, db: Session, **kwargs
+) -> Contract | None:
+
+    contract = (
+        db.query(Contract)
+        .filter(Contract.id == contract_id, Contract.user_id == user_id)
+        .first()
+    )
+
+    if contract:
+        for key, value in kwargs.items():
+            setattr(contract, key, value)
+
+        db.commit()
+        db.refresh(contract)
         return contract
+    return None
 
 
-def get_contracts_by_client(client_id: int, user_id: int) -> list[dict]:
-    with SessionLocal() as db:
-        contracts = (
-            db.query(Contract, Client, Service)
-            .filter(Contract.client_id == client_id, Contract.user_id == user_id)
-            .join(Client, Contract.client_id == Client.id)
-            .join(Service, Contract.service_id == Service.id)
-            .all()
-        )
+def delete_contract(contract_id: int, user_id: int, db: Session) -> bool:
+    contract = (
+        db.query(Contract)
+        .filter(Contract.id == contract_id, Contract.user_id == user_id)
+        .first()
+    )
 
-        clients_services = []
-        for contract, client, service in contracts:
-            clients_services.append(
-                {"contract": contract, "client": client, "service": service}
-            )
-
-        return clients_services
+    if contract:
+        db.delete(contract)
+        db.commit()
+        return True
+    return False
 
 
-def get_contracts_by_user(user_id: int) -> list[dict]:
-    with SessionLocal() as db:
-        contracts = (
-            db.query(Contract, Client, Service)
-            .filter(Contract.user_id == user_id)
-            .join(Client, Contract.client_id == Client.id)
-            .join(Service, Contract.service_id == Service.id)
-            .all()
-        )
+def toggle_contract_status(
+    contract_id: int, user_id: int, db: Session
+) -> Contract | None:
 
-        clients_services = []
-        for contract, client, service in contracts:
-            clients_services.append(
-                {"contract": contract, "client": client, "service": service}
-            )
+    contract = (
+        db.query(Contract)
+        .filter(Contract.id == contract_id, Contract.user_id == user_id)
+        .first()
+    )
 
-        return clients_services
-
-
-def update_contract(contract_id: int, user_id: int, **kwargs) -> Contract | None:
-    with SessionLocal() as db:
-        contract = (
-            db.query(Contract)
-            .filter(Contract.id == contract_id, Contract.user_id == user_id)
-            .first()
-        )
-
-        if contract:
-            for key, value in kwargs.items():
-                setattr(contract, key, value)
-
-            db.commit()
-            db.refresh(contract)
-            return contract
-        return None
-
-
-def delete_contract(contract_id: int, user_id: int) -> bool:
-    with SessionLocal() as db:
-        contract = (
-            db.query(Contract)
-            .filter(Contract.id == contract_id, Contract.user_id == user_id)
-            .first()
-        )
-
-        if contract:
-            db.delete(contract)
-            db.commit()
-            return True
-        return False
-
-
-def toggle_contract_status(contract_id: int, user_id: int) -> Contract | None:
-    with SessionLocal() as db:
-        contract = (
-            db.query(Contract)
-            .filter(Contract.id == contract_id, Contract.user_id == user_id)
-            .first()
-        )
-
-        if contract:
-            contract.status = not contract.status
-            db.commit()
-            db.refresh(contract)
-            return contract
-        return None
+    if contract:
+        contract.status = not contract.status
+        db.commit()
+        db.refresh(contract)
+        return contract
+    return None

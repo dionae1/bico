@@ -4,13 +4,17 @@ from app.models.user import User
 from app.schemas.client import CreateClientRequest, ResponseClient
 from app.services import client as client_service
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+from app.db.session import get_db
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
 
 @router.post("/", response_model=ResponseClient, status_code=status.HTTP_201_CREATED)
 def create_client(
-    client: CreateClientRequest, current_user: User = Depends(get_current_user)
+    client: CreateClientRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseClient:
 
     try:
@@ -20,6 +24,7 @@ def create_client(
             email=client.email,
             phone=client.phone,
             address=client.address,
+            db=db,
         )
         response = ResponseClient.from_model(created_client)
 
@@ -40,10 +45,10 @@ def create_client(
 
 @router.get("/", response_model=list[ResponseClient], status_code=status.HTTP_200_OK)
 def get_all_clients(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> list[ResponseClient]:
 
-    clients = client_service.get_client_by_user(user_id=current_user.id)
+    clients = client_service.get_client_by_user(user_id=current_user.id, db=db)
     if not clients:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No clients found"
@@ -57,11 +62,13 @@ def get_all_clients(
     "/{client_id}", response_model=ResponseClient, status_code=status.HTTP_200_OK
 )
 def get_client_by_id(
-    client_id: int, current_user: User = Depends(get_current_user)
+    client_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseClient:
 
     client = client_service.get_client_by_id(
-        client_id=client_id, user_id=current_user.id
+        client_id=client_id, user_id=current_user.id, db=db
     )
 
     if not client:
@@ -75,10 +82,14 @@ def get_client_by_id(
 
 @router.get("/", response_model=ResponseClient, status_code=status.HTTP_200_OK)
 def get_client_by_email(
-    email: str, current_user: User = Depends(get_current_user)
+    email: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseClient:
 
-    client = client_service.get_client_by_email(email=email, user_id=current_user.id)
+    client = client_service.get_client_by_email(
+        email=email, user_id=current_user.id, db=db
+    )
     if not client:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Client not found"
@@ -95,6 +106,7 @@ def update_client(
     client_id: int,
     client: CreateClientRequest,
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseClient:
 
     updated_client = client_service.update_client(
@@ -104,6 +116,7 @@ def update_client(
         email=client.email,
         phone=client.phone,
         address=client.address,
+        db=db,
     )
 
     if not updated_client:
@@ -121,11 +134,13 @@ def update_client(
     status_code=status.HTTP_200_OK,
 )
 def toggle_client_status(
-    client_id: int, current_user: User = Depends(get_current_user)
+    client_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseClient:
 
     updated_client = client_service.toggle_client_status(
-        client_id=client_id, user_id=current_user.id
+        client_id=client_id, user_id=current_user.id, db=db
     )
     if not updated_client:
         raise HTTPException(
@@ -140,12 +155,14 @@ def toggle_client_status(
     "/{client_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_client(
-    client_id: int, current_user: User = Depends(get_current_user)
+    client_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> None:
 
     try:
         success = client_service.delete_client(
-            client_id=client_id, user_id=current_user.id
+            client_id=client_id, user_id=current_user.id, db=db
         )
 
     except IntegrityError as e:
