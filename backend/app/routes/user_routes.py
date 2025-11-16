@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.models import User
 from app.services import user as user_service
-from app.schemas.user import ResponseUser, CreateUserRequest
+from app.schemas.user import ResponseUser, CreateUserRequest, UpdateUserRequest
 from app.core.auth import get_current_user
 from app.db.session import get_db
 
@@ -50,7 +50,7 @@ def delete_user(
 @router.put("/{user_id}", response_model=ResponseUser, status_code=status.HTTP_200_OK)
 def update_user(
     user_id: int,
-    user: CreateUserRequest,
+    user: UpdateUserRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ResponseUser:
@@ -61,7 +61,9 @@ def update_user(
         )
 
     updated_user = user_service.update_user(
-        user_id, email=user.email, name=user.name, password=user.password, db=db
+        user_id,
+        **user.model_dump(exclude_unset=True),
+        db=db,
     )
 
     if not updated_user:
