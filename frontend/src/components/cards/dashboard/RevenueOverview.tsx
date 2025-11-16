@@ -8,7 +8,7 @@ interface RevenueOverviewProps {
     profit_margin: number;
 }
 
-function RevenueOverview({ data, title = "Revenue Summary" }: { data: RevenueOverviewProps; title?: string }) {
+function RevenueOverview({ data, title = "Your Revenue" }: { data: RevenueOverviewProps; title?: string }) {
     return (
         <DashboardBase
             dataMap={[

@@ -1,4 +1,4 @@
-import { FaHome, FaCog, FaUsers, FaLeaf, FaOutdent } from "react-icons/fa";
+import { FaHome, FaCog, FaUsers, FaUser, FaOutdent } from "react-icons/fa";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { logout } from "../services/auth";
 
@@ -22,6 +22,11 @@ const items = [
         title: 'Contracts',
         path: '/contracts',
         icon: FaOutdent
+    },
+    {
+        title: 'Profile',
+        path: '/profile',
+        icon: FaUser
     }
 ];
 
@@ -88,6 +93,8 @@ function NavBar() {
                 </ul>
             </nav>
 
+
+            {/* Logout Button */}
             <div className="p-4 mt-auto">
                 <button className="w-full py-2 px-4 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 hover:cursor-pointer transition duration-200" onClick={handleLogout}>
                     Logout
