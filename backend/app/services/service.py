@@ -1,105 +1,53 @@
 from app.db.models import User, Service, Client, Supplier, Contract
-from app.db.session import SessionLocal
 from app.core.auth import hash_password, verify_password
+from sqlalchemy.orm import Session
 
 
-def create_service(
-    user_id: int,
-    name: str,
-    cost: float,
-    price: float,
-    description: str,
-    periodicity: str,
-    supplier_id: int | None = None,
-    status: bool = True,
-) -> Service:
-    with SessionLocal() as db:
-        service = Service(
-            user_id=user_id,
-            supplier_id=supplier_id,
-            name=name,
-            cost=cost,
-            price=price,
-            description=description,
-            periodicity=periodicity,
-            status=status,
-        )
-        db.add(service)
-        db.commit()
-        db.refresh(service)
-        return service
+def get_user_by_email(email: str, db: Session) -> User | None:
+    return db.query(User).filter(User.email == email).first()
 
 
-def get_service_by_id(service_id: int, user_id: int) -> Service | None:
-    with SessionLocal() as db:
-        return (
-            db.query(Service)
-            .filter(Service.id == service_id, Service.user_id == user_id)
-            .first()
-        )
+def get_user_by_id(user_id: int, db: Session) -> User | None:
+    return db.query(User).filter(User.id == user_id).first()
 
 
-def get_service_by_name(name: str, user_id: int) -> Service | None:
-    with SessionLocal() as db:
-        return (
-            db.query(Service)
-            .filter(Service.name == name, Service.user_id == user_id)
-            .first()
-        )
+def create_user(email: str, name: str, password: str, db: Session) -> User:
+    hashed_password = hash_password(password)
+    user = User(email=email, name=name, hashed_password=hashed_password)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 
-def get_services_by_user(user_id: int) -> list[Service]:
-    with SessionLocal() as db:
-        return db.query(Service).filter(Service.user_id == user_id).all()
+def authenticate_user(email: str, password: str, db: Session) -> User | None:
+    user = get_user_by_email(email, db=db)
+    if user and verify_password(password, user.hashed_password):
+        return user
+    return None
 
 
-def update_service(service_id: int, user_id: int, **kwargs) -> Service | None:
-    with SessionLocal() as db:
-        service = (
-            db.query(Service)
-            .filter(Service.id == service_id, Service.user_id == user_id)
-            .first()
-        )
-
-        if not service:
-            return None
-
-        for key, value in kwargs.items():
-            setattr(service, key, value)
-
-        db.commit()
-        db.refresh(service)
-        return service
-
-
-def delete_service(service_id: int, user_id: int) -> bool:
-    with SessionLocal() as db:
-        service = (
-            db.query(Service)
-            .filter(Service.id == service_id, Service.user_id == user_id)
-            .first()
-        )
-
-        if not service:
-            return False
-
-        db.delete(service)
+def delete_user(user_id: int, db: Session) -> bool:
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        db.delete(user)
         db.commit()
         return True
+    return False
 
 
-def toggle_service_status(service_id: int, user_id: int) -> Service | None:
-    with SessionLocal() as db:
-        service = (
-            db.query(Service)
-            .filter(Service.id == service_id, Service.user_id == user_id)
-            .first()
-        )
+def update_user(user_id: int, db: Session, **kwargs) -> User | None:
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return None
 
-        if not service:
-            return None
+    if "password" in kwargs:
+        kwargs["hashed_password"] = hash_password(kwargs.pop("password"))
 
-        service.status = not service.status
-        db.commit()
-        db.refresh(service)
-        return service
+    for key, value in kwargs.items():
+        if hasattr(user, key) and value is not None:
+            setattr(user, key, value)
+
+    db.commit()
+    db.refresh(user)
+    return user

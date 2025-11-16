@@ -22,3 +22,9 @@ class CreateUserRequest(BaseModel):
 class LoginUserRequest(BaseModel):
     email: str
     password: str
+
+
+class UpdateUserRequest(BaseModel):
+    email: str | None = None
+    name: str | None = None
+    password: str | None = None
