@@ -7,7 +7,10 @@ import os
 import jwt
 
 from app.services import user as user_service
+from app.db.session import get_db
 from app.models.user import User
+from sqlalchemy.orm import Session
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
@@ -52,7 +55,9 @@ def verify_refresh_token(token: str) -> bool:
         return False
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+) -> User:
     try:
         if not ALGORITHM or not SECRET_KEY:
             raise AssertionError("Missing JWT configuration")
@@ -68,7 +73,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     except jwt.exceptions.PyJWTError:
         raise CredentialsException()
 
-    user = user_service.get_user_by_id(user_id)
+    user = user_service.get_user_by_id(user_id, db=db)
 
     if user is None:
         raise CredentialsException()

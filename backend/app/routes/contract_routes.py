@@ -2,14 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.db.models import Contract
 from app.models.user import User
 from app.services import contract as contract_service
+from app.core.auth import get_current_user
+from app.db.session import get_db
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
 from app.schemas.contract import (
     CompleteResponseContract,
     ResponseContract,
     CreateContract,
     UpdateContract,
 )
-from app.core.auth import get_current_user
-from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(prefix="/contracts", tags=["contracts"])
 
@@ -18,6 +21,7 @@ router = APIRouter(prefix="/contracts", tags=["contracts"])
 def create_contract(
     contract: CreateContract,
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseContract:
 
     try:
@@ -28,6 +32,7 @@ def create_contract(
             created_at=contract.created_at,
             end_at=contract.end_at,
             value=contract.value,
+            db=db,
         )
 
     except IntegrityError:
@@ -59,9 +64,10 @@ def create_contract(
 )
 def get_contracts(
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> list[CompleteResponseContract]:
 
-    contracts = contract_service.get_contracts_by_user(current_user.id)
+    contracts = contract_service.get_contracts_by_user(current_user.id, db=db)
 
     if not contracts:
         raise HTTPException(status_code=404, detail="No contracts found")
@@ -82,11 +88,13 @@ def get_contracts(
     status_code=status.HTTP_200_OK,
 )
 def get_contracts_by_client(
-    client_id: int, current_user: User = Depends(get_current_user)
+    client_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> list[CompleteResponseContract]:
 
     contracts = contract_service.get_contracts_by_client(
-        client_id=client_id, user_id=current_user.id
+        client_id=client_id, user_id=current_user.id, db=db
     )
 
     if not contracts:
@@ -108,11 +116,13 @@ def get_contracts_by_client(
     status_code=status.HTTP_200_OK,
 )
 def get_contract(
-    contract_id: int, current_user: User = Depends(get_current_user)
+    contract_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> CompleteResponseContract:
 
     contract = contract_service.get_contract_by_id(
-        contract_id=contract_id, user_id=current_user.id
+        contract_id=contract_id, user_id=current_user.id, db=db
     )
 
     if not contract:
@@ -128,11 +138,13 @@ def get_contract(
     "/{contract_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_contract(
-    contract_id: int, current_user: User = Depends(get_current_user)
+    contract_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> None:
 
     success = contract_service.delete_contract(
-        contract_id=contract_id, user_id=current_user.id
+        contract_id=contract_id, user_id=current_user.id, db=db
     )
 
     if not success:
@@ -148,6 +160,7 @@ def update_contract(
     contract_id: int,
     contract: UpdateContract,
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseContract:
 
     updated_contract = contract_service.update_contract(
@@ -155,6 +168,7 @@ def update_contract(
         user_id=current_user.id,
         end_at=contract.end_at,
         value=contract.value,
+        db=db,
     )
 
     if not updated_contract:
@@ -170,11 +184,13 @@ def update_contract(
     status_code=status.HTTP_200_OK,
 )
 def toggle_contract_status(
-    contract_id: int, current_user: User = Depends(get_current_user)
+    contract_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseContract:
 
     contract = contract_service.toggle_contract_status(
-        contract_id=contract_id, user_id=current_user.id
+        contract_id=contract_id, user_id=current_user.id, db=db
     )
 
     if not contract:
