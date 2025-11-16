@@ -19,6 +19,8 @@ import MainService from './pages/services/MainService'
 import CreateService from './pages/services/CreateService'
 import ViewService from './pages/services/ViewService'
 
+import Profile from './pages/Profile'
+
 import MainLayout from './components/layouts/MainLayout'
 import NotFoundPage from './pages/NotFoundPage'
 
@@ -37,6 +39,12 @@ function App() {
           <Route path='home' element={
             <ProtectedRoutes>
               <HomePage />
+            </ProtectedRoutes>
+          } />
+
+          <Route path='profile' element={
+            <ProtectedRoutes>
+              <Profile />
             </ProtectedRoutes>
           } />
 
