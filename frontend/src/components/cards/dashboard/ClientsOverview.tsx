@@ -9,14 +9,14 @@ interface ClientsOverviewProps {
     new_clients_percentage: number;
 }
 
-function ClientsOverview({ data, title = "Clients Overview" }: { data: ClientsOverviewProps; title?: string }) {
+function ClientsOverview({ data, title = "About your Clients" }: { data: ClientsOverviewProps; title?: string }) {
     return (
         <DashboardBase
             dataMap={[
-                ["In Total", data.total_clients],
+                ["Total", data.total_clients],
                 ["In Contracts", data.clients_with_contracts],
                 // ["Active", data.active_clients],
-                ["Inactive", data.inactive_clients],
+                // ["Inactive", data.inactive_clients],
                 ["This Month", data.monthly_new_clients],
             ]}
             title={title}

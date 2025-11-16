@@ -1,19 +1,5 @@
 @import "tailwindcss";
 
 * {
-    font-family: 'Nunito', sans-serif;
-}
-
-/* Custom cute animations */
-@keyframes spin-slow {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.animate-spin-slow {
-    animation: spin-slow 8s linear infinite;
+    font-family: 'Montserrat', 'Roboto', sans-serif;
 }
