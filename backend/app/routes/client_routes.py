@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.auth import get_current_user
 from app.models.user import User
-from app.schemas.client import CreateClientRequest, ResponseClient
+from app.schemas.client import CreateClientRequest, ResponseClient, UpdateClientRequest
 from app.services import client as client_service
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -104,7 +104,7 @@ def get_client_by_email(
 )
 def update_client(
     client_id: int,
-    client: CreateClientRequest,
+    client: UpdateClientRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ResponseClient:
@@ -112,10 +112,7 @@ def update_client(
     updated_client = client_service.update_client(
         client_id=client_id,
         user_id=current_user.id,
-        name=client.name,
-        email=client.email,
-        phone=client.phone,
-        address=client.address,
+        **client.model_dump(exclude_unset=True),
         db=db,
     )
 

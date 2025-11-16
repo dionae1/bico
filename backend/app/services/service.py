@@ -64,7 +64,8 @@ def update_service(
         return None
 
     for key, value in kwargs.items():
-        setattr(service, key, value)
+        if hasattr(service, key) and value is not None:
+            setattr(service, key, value)
 
     db.commit()
     db.refresh(service)

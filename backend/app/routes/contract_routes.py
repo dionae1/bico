@@ -166,8 +166,7 @@ def update_contract(
     updated_contract = contract_service.update_contract(
         contract_id=contract_id,
         user_id=current_user.id,
-        end_at=contract.end_at,
-        value=contract.value,
+        **contract.model_dump(exclude_unset=True),
         db=db,
     )
 

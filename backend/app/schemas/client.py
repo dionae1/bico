@@ -28,3 +28,10 @@ class CreateClientRequest(BaseModel):
     email: str
     phone: str
     address: str
+
+
+class UpdateClientRequest(BaseModel):
+    name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    address: str | None = None

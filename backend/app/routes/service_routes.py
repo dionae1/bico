@@ -90,11 +90,7 @@ def update_service(
     updated_service = services_.update_service(
         service_id=service_id,
         user_id=current_user.id,
-        name=service.name,
-        description=service.description,
-        price=service.price,
-        cost=service.cost,
-        periodicity=service.periodicity,
+        **service.model_dump(exclude_unset=True),
         db=db,
     )
     if not updated_service:

@@ -61,7 +61,8 @@ def update_client(client_id: int, user_id: int, db: Session, **kwargs) -> Client
         return None
 
     for key, value in kwargs.items():
-        setattr(client, key, value)
+        if hasattr(client, key) and value is not None:
+            setattr(client, key, value)
 
     db.commit()
     db.refresh(client)

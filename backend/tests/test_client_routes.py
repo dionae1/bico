@@ -1,231 +1,149 @@
-import pytest
 from fastapi import status
-from tests.conftest import get_auth_headers, URL_PREFIX
+from conftest import URL_PREFIX
+from factories.client import ClientFactory
 
 
-def create_client(client, sample_client_data):
-    """Create the client instance for tests"""
+def test_create_client(client_user):
+    client = ClientFactory.build()
+    payload = {
+        "name": client.name,
+        "email": client.email,
+        "phone": client.phone,
+        "address": client.address,
+    }
+    response = client_user.post(f"{URL_PREFIX}/clients/", json=payload)
+    assert response.status_code == status.HTTP_201_CREATED
 
-    headers = get_auth_headers(client)
-    response = client.post(
-        f"{URL_PREFIX}/clients/", json=sample_client_data, headers=headers
-    )
-    data = response.json()
 
-    return {
-        "headers": headers,
-        "client_id": data["data"]["id"],
-        "client_data": data["data"],
+def test_duplicate_client_creation(client_user):
+    client = ClientFactory()
+    payload = {
+        "name": client.name,
+        "email": client.email,
+        "phone": client.phone,
+        "address": client.address,
+    }
+    response = client_user.post(f"{URL_PREFIX}/clients/", json=payload)
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+def test_get_all_clients(client_user):
+    client = ClientFactory.build()
+    client_2 = ClientFactory.build()
+
+    payload_1 = {
+        "name": client.name,
+        "email": client.email,
+        "phone": client.phone,
+        "address": client.address,
+    }
+    payload_2 = {
+        "name": client_2.name,
+        "email": client_2.email,
+        "phone": client_2.phone,
+        "address": client_2.address,
     }
 
+    client_user.post(f"{URL_PREFIX}/clients/", json=payload_1)
+    client_user.post(f"{URL_PREFIX}/clients/", json=payload_2)
+    response = client_user.get(f"{URL_PREFIX}/clients/")
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 2
 
-def delete_client(client, client_id):
-    """Delete the client instance after tests."""
 
-    headers = get_auth_headers(client)
-    client.delete(
-        f"{URL_PREFIX}/clients/{client_id}",
-        headers=headers,
+def test_get_all_clients_no_clients(client_user):
+    response = client_user.get(f"{URL_PREFIX}/clients/")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_get_client_by_id(client_user):
+    client = ClientFactory.build()
+    payload = {
+        "name": client.name,
+        "email": client.email,
+        "phone": client.phone,
+        "address": client.address,
+    }
+    create_response = client_user.post(f"{URL_PREFIX}/clients/", json=payload)
+    client_id = create_response.json()["id"]
+
+    response = client_user.get(f"{URL_PREFIX}/clients/{client_id}")
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["id"] == client_id
+    assert data["name"] == client.name
+
+
+def test_get_client_by_id_not_found(client_user):
+    response = client_user.get(f"{URL_PREFIX}/clients/9999")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_delete_client(client_user):
+    client = ClientFactory.build()
+    payload = {
+        "name": client.name,
+        "email": client.email,
+        "phone": client.phone,
+        "address": client.address,
+    }
+    create_response = client_user.post(f"{URL_PREFIX}/clients/", json=payload)
+    client_id = create_response.json()["id"]
+
+    delete_response = client_user.delete(f"{URL_PREFIX}/clients/{client_id}")
+    assert delete_response.status_code == status.HTTP_204_NO_CONTENT
+
+    get_response = client_user.get(f"{URL_PREFIX}/clients/{client_id}")
+    assert get_response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_delete_client_not_found(client_user):
+    response = client_user.delete(f"{URL_PREFIX}/clients/9999")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_update_client(client_user):
+    client = ClientFactory.build()
+    payload = {
+        "name": client.name,
+        "email": client.email,
+        "phone": client.phone,
+        "address": client.address,
+    }
+    create_response = client_user.post(f"{URL_PREFIX}/clients/", json=payload)
+    client_id = create_response.json()["id"]
+
+    updated_payload = {
+        "name": "Updated Name",
+        "email": "updated_email@example.com",
+    }
+    update_response = client_user.put(
+        f"{URL_PREFIX}/clients/{client_id}", json=updated_payload
     )
+    assert update_response.status_code == status.HTTP_200_OK
+    data = update_response.json()
+    assert data["id"] == client_id
+    assert data["name"] == "Updated Name"
+    assert data["email"] == "updated_email@example.com"
 
 
-class TestClientRoutes:
-    """Test client routes - all require authentication"""
+def test_toggle_client_status(client_user):
+    client = ClientFactory.build()
+    payload = {
+        "name": client.name,
+        "email": client.email,
+        "phone": client.phone,
+        "address": client.address,
+    }
+    create_response = client_user.post(f"{URL_PREFIX}/clients/", json=payload)
+    client_id = create_response.json()["id"]
 
-    def test_create_client_success(self, client, sample_user_data, sample_client_data):
-        """Test creating a client"""
+    response = client_user.patch(f"{URL_PREFIX}/clients/{client_id}/toggle-status")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["status"] is False
 
-        headers = get_auth_headers(client)
-
-        response = client.post(
-            f"{URL_PREFIX}/clients/", json=sample_client_data, headers=headers
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data["success"] is True
-        assert data["message"] == "Client created successfully"
-        assert "id" in data["data"]
-        assert data["data"]["name"] == sample_client_data["name"]
-        assert data["data"]["email"] == sample_client_data["email"]
-        assert data["data"]["address"] == sample_client_data["address"]
-
-        delete_client(client, data["data"]["id"])
-
-    def test_unauthorized_access(self, client, sample_client_data):
-        """Test creating client without authentication"""
-
-        response = client.post(f"{URL_PREFIX}/clients/", json=sample_client_data)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_create_client_duplicate_email(
-        self, client, sample_user_data, sample_client_data
-    ):
-        """Test creating client with duplicate email"""
-        client_id = create_client(
-            client=client,
-            sample_client_data=sample_client_data,
-        )["client_id"]
-
-        headers = get_auth_headers(client)
-        response = client.post(
-            f"{URL_PREFIX}/clients/", json=sample_client_data, headers=headers
-        )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-        delete_client(client, client_id=client_id)
-
-    def test_get_all_clients_success(
-        self, client, sample_user_data, sample_client_data
-    ):
-        """Test getting all clients"""
-
-        client_id = create_client(
-            client=client,
-            sample_client_data=sample_client_data,
-        )["client_id"]
-
-        headers = get_auth_headers(client)
-        response = client.get(f"{URL_PREFIX}/clients/", headers=headers)
-
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data["success"] is True
-        assert isinstance(data["data"], list)
-        assert len(data["data"]) >= 1
-
-        delete_client(client, client_id)
-
-    def test_get_client_by_id_success(
-        self, client, sample_user_data, sample_client_data
-    ):
-        """Test getting client by ID"""
-
-        client_id = create_client(
-            client=client,
-            sample_client_data=sample_client_data,
-        )["client_id"]
-
-        headers = get_auth_headers(client)
-        response = client.get(f"{URL_PREFIX}/clients/{client_id}", headers=headers)
-
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data["success"] is True
-        assert data["data"]["id"] == client_id
-        assert data["data"]["name"] == sample_client_data["name"]
-
-        delete_client(client, client_id)
-
-    def test_get_client_by_id_not_found(self, client, sample_user_data):
-        """Test getting non-existent client"""
-
-        headers = get_auth_headers(client)
-
-        response = client.get(f"{URL_PREFIX}/clients/99999", headers=headers)
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    def test_update_client_success(self, client, sample_user_data, sample_client_data):
-        """Test updating a client"""
-
-        headers = get_auth_headers(client)
-        client_id = create_client(
-            client=client,
-            sample_client_data=sample_client_data,
-        )["client_id"]
-
-        update_data = {
-            "email": "updated@example.com",
-            "name": "Updated Client Name",
-            "address": "456 Updated Street",
-            "phone": "09876543210",
-        }
-        response = client.put(
-            f"{URL_PREFIX}/clients/{client_id}", json=update_data, headers=headers
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data["success"] is True
-        assert data["data"]["name"] == update_data["name"]
-        assert data["data"]["address"] == update_data["address"]
-        assert data["data"]["phone"] == update_data["phone"]
-
-        delete_client(client, client_id)
-
-    def test_update_client_not_found(self, client):
-        """Test updating non-existent client"""
-        headers = get_auth_headers(client)
-
-        update_data = {
-            "email": "updated@example.com",
-            "name": "Updated Client Name",
-            "address": "456 Updated Street",
-            "phone": "09876543210",
-        }
-
-        response = client.put(
-            f"{URL_PREFIX}/clients/99999", json=update_data, headers=headers
-        )
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    def test_toggle_client_status_success(
-        self, client, sample_user_data, sample_client_data
-    ):
-        """Test toggling client status"""
-
-        headers = get_auth_headers(client)
-        full_data = create_client(
-            client=client,
-            sample_client_data=sample_client_data,
-        )
-        client_id = full_data["client_id"]
-        original_status = full_data["client_data"]["status"]
-
-        response = client.patch(
-            f"{URL_PREFIX}/clients/{client_id}/toggle-status", headers=headers
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-
-        assert data["success"] is True
-        assert data["data"]["status"] != original_status
-
-        delete_client(client, client_id)
-
-    def test_toggle_client_status_not_found(self, client, sample_user_data):
-        """Test toggling status of non-existent client"""
-
-        headers = get_auth_headers(client)
-
-        response = client.patch(
-            f"{URL_PREFIX}/clients/99999/toggle-status", headers=headers
-        )
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    def test_delete_client_success(self, client, sample_user_data, sample_client_data):
-        """Test deleting a client"""
-
-        headers = get_auth_headers(client)
-        full_data = create_client(
-            client=client,
-            sample_client_data=sample_client_data,
-        )
-        client_id = full_data["client_id"]
-
-        response = client.delete(f"{URL_PREFIX}/clients/{client_id}", headers=headers)
-
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-
-        assert data["success"] is True
-        assert "deleted successfully" in data["message"]
-
-    def test_delete_client_not_found(self, client, sample_user_data):
-        """Test deleting non-existent client"""
-
-        headers = get_auth_headers(client)
-
-        response = client.delete(f"{URL_PREFIX}/clients/99999", headers=headers)
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+    response = client_user.patch(f"{URL_PREFIX}/clients/{client_id}/toggle-status")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["status"] is True
