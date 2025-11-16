@@ -1,18 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 from app.db.models import User
 from app.services import user as user_service
 from app.schemas.user import ResponseUser, CreateUserRequest
 from app.core.auth import get_current_user
+from app.db.session import get_db
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.post("/", response_model=ResponseUser, status_code=status.HTTP_201_CREATED)
 def create_user(
-    user: CreateUserRequest, current_user: User = Depends(get_current_user)
+    user: CreateUserRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseUser:
 
-    created_user = user_service.create_user(user.email, user.name, user.password)
+    created_user = user_service.create_user(user.email, user.name, user.password, db=db)
 
     if not created_user:
         raise HTTPException(status_code=400, detail="User creation failed")
@@ -30,8 +34,12 @@ def get_user_me(current_user: User = Depends(get_current_user)) -> ResponseUser:
 @router.delete(
     "/{user_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
 )
-def delete_user(user_id: int, current_user: User = Depends(get_current_user)) -> None:
-    success = user_service.delete_user(user_id)
+def delete_user(
+    user_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> None:
+    success = user_service.delete_user(user_id, db=db)
 
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
@@ -44,6 +52,7 @@ def update_user(
     user_id: int,
     user: CreateUserRequest,
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ResponseUser:
 
     if current_user.id != user_id:
@@ -52,7 +61,7 @@ def update_user(
         )
 
     updated_user = user_service.update_user(
-        user_id, email=user.email, name=user.name, password=user.password
+        user_id, email=user.email, name=user.name, password=user.password, db=db
     )
 
     if not updated_user:
