@@ -10,7 +10,21 @@ from app.routes import (
     dashboard_routes,
 )
 
-app = FastAPI(title="CSManager API", version="1.0.0")
+from app.scheduler import scheduler, cleanup_demo_accounts
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler.add_job(cleanup_demo_accounts, "interval", hours=8)
+    scheduler.start()
+    print("Scheduler started")
+    yield
+    scheduler.shutdown()
+    print("Scheduler stopped")
+
+
+app = FastAPI(title="CSManager API", version="1.0.0", lifespan=lifespan)
 
 origins = [
     "http://localhost",
@@ -24,6 +38,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 v1_router = APIRouter(prefix="/api/v1")
 

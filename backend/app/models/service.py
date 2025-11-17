@@ -8,7 +8,7 @@ class Service(Base):
     __tablename__ = "services"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     supplier_id: Mapped[int] = mapped_column(ForeignKey("suppliers.id"), nullable=True)
     name: Mapped[str] = mapped_column(String(100))
     cost: Mapped[float] = mapped_column(Float)
@@ -20,4 +20,6 @@ class Service(Base):
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="services")
     supplier: Mapped["Supplier"] = relationship("Supplier", back_populates="services")
-    contracts: Mapped[list["Contract"]] = relationship("Contract", back_populates="service")
+    contracts: Mapped[list["Contract"]] = relationship(
+        "Contract", back_populates="service"
+    )
