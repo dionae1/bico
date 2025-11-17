@@ -17,6 +17,16 @@ def create_client(
     db: Session = Depends(get_db),
 ) -> ResponseClient:
 
+    existing_clients = client_service.get_client_by_user(user_id=current_user.id, db=db)
+    for existing_client in existing_clients:
+        if (
+            existing_client.email == client.email
+            or existing_client.phone == client.phone
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Client with this email or phone already exists",
+            )
     try:
         created_client = client_service.create_client(
             user_id=current_user.id,
