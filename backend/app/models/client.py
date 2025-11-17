@@ -10,11 +10,14 @@ class Client(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), index=True, server_default="0", nullable=False
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+        server_default="0",
+        nullable=False,
     )
     name: Mapped[str] = mapped_column(String(100))
-    email: Mapped[str] = mapped_column(String(50), unique=True)
-    phone: Mapped[str] = mapped_column(String(11), unique=True)
+    email: Mapped[str] = mapped_column(String(50))
+    phone: Mapped[str] = mapped_column(String(11))
     address: Mapped[str] = mapped_column(String(200))
     status: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(

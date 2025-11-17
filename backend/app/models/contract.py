@@ -11,7 +11,7 @@ class Contract(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     service_id: Mapped[int] = mapped_column(ForeignKey("services.id"))
     client_id: Mapped[int] = mapped_column(ForeignKey("clients.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     end_at: Mapped[datetime] = mapped_column(DateTime)
     status: Mapped[bool] = mapped_column(default=True)

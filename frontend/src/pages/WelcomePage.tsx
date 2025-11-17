@@ -1,7 +1,17 @@
 import { FaHandshake, FaCloud, FaChartLine, FaUserTie, FaFileContract, FaArrowRight } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
 
+import api from "../api/client";
+
 function WelcomePage() {
+
+    const handleDemoClick = async () => {
+        const res = await api.post('/auth/demo', {})
+        if (res.status === 200) {
+            localStorage.setItem('token', res.data.access_token);
+            window.location.href = '/home';
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -19,8 +29,14 @@ function WelcomePage() {
                                 to="/signup"
                                 className="bg-emerald-500 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-emerald-600 transition-colors duration-200 flex items-center gap-2 shadow-md"
                             >
-                                Get Started <FaArrowRight />
+                                Create an Account <FaArrowRight />
                             </Link>
+                            <button
+                                className="bg-white text-gray-800 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors border-2 border-gray-300 hover:cursor-pointer"
+                                onClick={handleDemoClick}
+                            >
+                                Try Demo
+                            </button>
                             <Link
                                 to="/login"
                                 className="bg-white text-gray-800 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors duration-200 border-2 border-gray-300"

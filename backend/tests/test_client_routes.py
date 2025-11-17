@@ -16,13 +16,14 @@ def test_create_client(client_user):
 
 
 def test_duplicate_client_creation(client_user):
-    client = ClientFactory()
+    client = ClientFactory.build()
     payload = {
         "name": client.name,
         "email": client.email,
         "phone": client.phone,
         "address": client.address,
     }
+    client_user.post(f"{URL_PREFIX}/clients/", json=payload)
     response = client_user.post(f"{URL_PREFIX}/clients/", json=payload)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
