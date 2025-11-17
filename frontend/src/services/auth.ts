@@ -24,4 +24,7 @@ export const register = async (name: string, email: string, password: string) =>
 
 export const logout = () => {
     localStorage.removeItem('token');
+    api.post('/auth/logout', { withCredentials: true }).catch((error) => {
+        console.error("Logout failed:", error);
+    });
 };
