@@ -40,6 +40,13 @@ def login(user_in: LoginUserRequest, db: Session = Depends(get_db)):
     return response
 
 
+@router.post("/logout", status_code=status.HTTP_200_OK)
+def logout():
+    response = JSONResponse({"detail": "Successfully logged out"})
+    response.delete_cookie(key="refresh_token", path="/api/v1/auth/refresh")
+    return response
+
+
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(user_in: CreateUserRequest, db: Session = Depends(get_db)) -> ResponseUser:
 
