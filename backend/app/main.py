@@ -29,6 +29,8 @@ app = FastAPI(title="CSManager API", version="1.0.0", lifespan=lifespan)
 origins = [
     "http://localhost",
     "http://localhost:5173",
+    "http://127.0.0.1",
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
