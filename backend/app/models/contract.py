@@ -9,9 +9,11 @@ class Contract(Base):
     __tablename__ = "contracts"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    service_id: Mapped[int] = mapped_column(ForeignKey("services.id"))
-    client_id: Mapped[int] = mapped_column(ForeignKey("clients.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    service_id: Mapped[int] = mapped_column(ForeignKey("services.id"), index=True)
+    client_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     end_at: Mapped[datetime] = mapped_column(DateTime)
     status: Mapped[bool] = mapped_column(default=True)
