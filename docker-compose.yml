@@ -13,8 +13,17 @@ services:
     container_name: frontend
     depends_on:
       - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME:-localhost}
+    volumes:
+      - ./caddy_data:/data
+      - ./caddy_config:/config
     networks:
       - internal
+      - external
 
   postgres:
     image: postgres:16
@@ -27,22 +36,6 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - internal
-
-  caddy:
-    image: caddy:latest
-    container_name: caddy
-    ports:
-      - "80:80"
-    volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - internal
-      - external
 
 volumes:
   pgdata:
