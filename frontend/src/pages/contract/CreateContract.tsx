@@ -10,7 +10,7 @@ function CreateContract() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg mt-10 p-10">
+        <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-sm border border-slate-200 mt-10 p-10">
             <ContractForm onCreated={handleContractCreated} />
         </div>
     );

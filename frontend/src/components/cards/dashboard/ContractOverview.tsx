@@ -8,14 +8,14 @@ interface ContractOverviewProps {
     new_contracts_percentage: number;
 }
 
-function ContractOverview({ data, title = "Contracts Summary" }: { data: ContractOverviewProps; title?: string }) {
+function ContractOverview({ data, title = "Contracts" }: { data: ContractOverviewProps; title?: string }) {
     return (
         <DashboardBase
             dataMap={[
                 ["Total", data.total_contracts],
                 ["Active", data.active_contracts],
-                ["Expired", data.inactive_contracts],
-                ["This Month", data.monthly_new_contracts],
+                // ["Expired", data.inactive_contracts],
+                // ["This Month", data.monthly_new_contracts],
             ]}
             percentage={data.new_contracts_percentage}
             title={title}

@@ -30,7 +30,7 @@ const items = [
     }
 ];
 
-function NavBar() {
+function NavBar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void }) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -39,68 +39,77 @@ function NavBar() {
         navigate("/");
     };
 
+    const sidebarClasses = `
+        fixed inset-y-0 left-0 z-30 w-64 bg-slate-50 flex flex-col border-r border-slate-200 transition-transform duration-300 ease-in-out
+        md:translate-x-0 md:static md:h-screen
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+    `;
+
     return (
-        <aside className="w-64 bg-gradient-to-b from-slate-50 via-slate-100 flex-shrink-0 flex flex-col shadow-xl sticky top-0 h-screen overflow-hidden border-r border-slate-300">
+        <>
+            {/* mobile */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-20 md:hidden"
+                    onClick={onClose}
+                />
+            )}
 
-            {/* Header */}
-            <div className="text-center mt-14 mb-4">
-                <h1 className="text-5xl text-slate-700 font-extrabold tracking-wider">BiCO</h1>
-                <p className="text-md text-slate-500 font-bold">Services Manager</p>
-            </div>
+            <aside className={sidebarClasses}>
+                {/* head */}
+                <div className="text-center mt-10 mb-8 relative">
+                    <h1 className="text-4xl text-slate-800 font-bold tracking-tight">BiCO</h1>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-widest mt-1">Services Manager</p>
+                </div>
 
-            {/* Navigation */}
-            <nav className="flex-grow px-2 mt-4">
-                <ul className="space-y-2">
-                    {items.map((item) => {
-                        const IconComponent = item.icon;
-                        const isActive = location.pathname === item.path;
+                {/* nav */}
+                <nav className="flex-grow px-3 mt-2">
+                    <ul className="space-y-1">
+                        {items.map((item) => {
+                            const IconComponent = item.icon;
+                            const isActive = location.pathname === item.path;
 
-                        return (
-                            <li key={item.title}>
-                                <Link
-                                    to={item.path}
-                                    className={`
-                                        flex items-center p-3 rounded-md transition-all duration-300 group relative overflow-hidden
-                                        ${isActive
-                                            ? 'bg-green-100 shadow-xs'
-                                            : 'hover:bg-slate-100 hover:shadow-sm'
-                                        }
-                                    `}
-                                >
-                                    <IconComponent className={`
-                                        text-lg mr-3 transition-all duration-300
-                                        ${isActive
-                                            ? 'text-emerald-600'
-                                            : 'text-slate-600 group-hover:text-emerald-500'
-                                        }
-                                    `} />
-                                    <span className={`
-                                        font-bold
-                                        ${isActive
-                                            ? 'text-emerald-700'
-                                            : 'text-slate-600 group-hover:text-slate-700'
-                                        }
-                                    `}>
-                                        {item.title}
-                                    </span>
-                                    {isActive && (
-                                        <div className="absolute right-2 w-2 h-2 bg-emerald-500 rounded-full" />
-                                    )}
-                                </Link>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </nav>
+                            return (
+                                <li key={item.title}>
+                                    <Link
+                                        to={item.path}
+                                        onClick={onClose}
+                                        className={`
+                                            flex items-center px-4 py-2.5 rounded-sm transition-all duration-200 group relative
+                                            ${isActive
+                                                ? 'bg-white text-emerald-700 shadow-sm border-l-2 border-emerald-500'
+                                                : 'text-slate-600 hover:bg-white hover:text-slate-900'
+                                            }
+                                        `}
+                                    >
+                                        <IconComponent className={`
+                                            text-lg mr-3 transition-colors duration-200
+                                            ${isActive
+                                                ? 'text-emerald-600'
+                                                : 'text-slate-400 group-hover:text-emerald-500'
+                                            }
+                                        `} />
+                                        <span className={`
+                                            font-medium text-sm
+                                        `}>
+                                            {item.title}
+                                        </span>
+                                    </Link>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </nav>
 
 
-            {/* Logout Button */}
-            <div className="p-4 mt-auto">
-                <button className="w-full py-2 px-4 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 hover:cursor-pointer transition duration-200" onClick={handleLogout}>
-                    Logout
-                </button>
-            </div>
-        </aside>
+                {/* out */}
+                <div className="p-4 mt-auto border-t border-slate-200">
+                    <button className="w-full py-2.5 px-4 bg-white border border-slate-200 text-slate-600 font-medium text-sm rounded-sm hover:bg-slate-50 hover:text-red-600 hover:border-red-200 hover:cursor-pointer transition duration-200 shadow-sm" onClick={handleLogout}>
+                        Logout
+                    </button>
+                </div>
+            </aside>
+        </>
     );
 }
 
