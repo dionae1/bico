@@ -1,16 +1,12 @@
-import os
 from typing import Generator
 
-from dotenv import load_dotenv
 from pytest import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL")
+from app.core.config import settings
 
-if DATABASE_URL is None:
-    raise ValueError("DATABASE_URL environment variable is not set")
+DATABASE_URL = settings.DATABASE_URL
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

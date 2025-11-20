@@ -25,9 +25,9 @@ async def lifespan(app: FastAPI):
     print("Scheduler stopped")
 
 
-import os
+from app.core.config import settings
 
-domain_name = os.getenv("DOMAIN_NAME", "localhost")
+domain_name = settings.DOMAIN_NAME
 
 origins = [
     "http://localhost",
