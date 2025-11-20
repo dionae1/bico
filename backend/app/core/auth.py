@@ -2,10 +2,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
-from dotenv import load_dotenv
-import os
 import jwt
 
+from app.core.config import settings
 from app.services import user as user_service
 from app.db.session import get_db
 from app.models.user import User
@@ -14,9 +13,8 @@ from sqlalchemy.orm import Session
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY") or "generic_secret_key"
-ALGORITHM = os.getenv("ALGORITHM") or "HS256"
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

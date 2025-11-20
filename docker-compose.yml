@@ -5,8 +5,8 @@ services:
     env_file: .env
     depends_on:
       - postgres
-    networks:
-      - internal
+    ports:
+      - "8000:8000"
 
   frontend:
     build: ./frontend
@@ -21,30 +21,18 @@ services:
     volumes:
       - ./caddy_data:/data
       - ./caddy_config:/config
-    networks:
-      - internal
-      - external
 
   postgres:
     image: postgres:16
     container_name: postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB:-default}
+      - POSTGRES_USER=${POSTGRES_USER:-user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    networks:
-      - internal
 
 volumes:
   pgdata:
   caddy_data:
   caddy_config:
-
-
-networks:
-  internal:
-    internal: true
-  external:
-    external: false
