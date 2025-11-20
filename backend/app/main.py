@@ -30,9 +30,9 @@ from app.core.config import settings
 domain_name = settings.DOMAIN_NAME
 
 origins = [
-    "http://localhost",
+    "http://localhost:5173",
     "https://localhost",
-    "http://127.0.0.1",
+    "http://127.0.0.1:5173",
     "https://127.0.0.1",
     f"https://{domain_name}",
 ]
