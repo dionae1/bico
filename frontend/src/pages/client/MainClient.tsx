@@ -41,18 +41,18 @@ function MainClient() {
     return (
         <div className="max-w-4xl mx-auto p-6">
 
-            <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Manage your Clients</h1>
+            <h1 className="text-3xl font-bold mb-8 text-center text-slate-800">Manage your Clients</h1>
 
-            <div className="bg-white shadow-lg rounded-lg p-6 mb-8 mt-4">
+            <div className="bg-white shadow-sm rounded-sm border border-slate-200 p-6 mb-8 mt-4">
 
-                <Link className="p-2 transition-colors duration-200 cursor-pointer hover:underline rounded text-lg"
+                <Link className="p-2 transition-colors duration-200 cursor-pointer hover:underline rounded-sm text-lg text-emerald-600 hover:text-emerald-700 font-medium"
                     to="/clients/new">Register a new client</Link>
 
                 <div className="mb-4 mt-4">
                     <input
                         type="text"
                         placeholder="Search by name ..."
-                        className="border-2 border-gray-300 rounded-lg p-2 w-full"
+                        className="border border-slate-300 rounded-sm p-2.5 w-full focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value)

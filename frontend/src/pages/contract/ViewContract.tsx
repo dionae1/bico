@@ -71,13 +71,13 @@ function ViewContract() {
 
     return (
         <div className="max-w-4xl mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-4">View Contract</h1>
+            <h1 className="text-3xl font-bold mb-4 text-slate-800">View Contract</h1>
             <div>
                 <BackButton />
             </div>
             {isValid ? (
-                <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg my-4 flex flex-col space-y-4">
-                    <h2 className="text-xl font-semibold text-gray-800 text-center">Change the info below to update the contract.</h2>
+                <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white shadow-sm rounded-sm border border-slate-200 my-4 flex flex-col space-y-4">
+                    <h2 className="text-xl font-semibold text-slate-800 text-center">Change the info below to update the contract.</h2>
                     <FormInput
                         id="client"
                         label="Client"

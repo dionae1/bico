@@ -79,13 +79,13 @@ function ContractForm({ onCreated }: { onCreated?: () => void }) {
     }
 
     return (
-        <div className="m-auto rounded-lg bg-white flex flex-col p-4 w-full">
+        <div className="m-auto rounded-sm bg-white flex flex-col p-4 w-full">
             <div>
                 <BackButton />
             </div>
 
             <form onSubmit={e => handleSubmit(e)} className="flex flex-col justify-center m-6 space-y-2">
-                <h2 className="text-xl font-semibold text-gray-800 text-center mb-10">Fill the form below to create a new contract</h2>
+                <h2 className="text-xl font-semibold text-slate-800 text-center mb-10">Fill the form below to create a new contract</h2>
                 <FormInput
                     id="contractValue"
                     label="Value $"

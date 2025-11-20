@@ -39,18 +39,18 @@ function ClientCard({ client, refreshClients }: { client: Client; refreshClients
     }
 
     return (
-        <div className="p-4 rounded-lg w-full md:w-auto flex-1 border border-gray-200 shadow-sm hover:shadow-lg hover:cursor-pointer transition-shadow duration-75">
+        <div className="p-6 rounded-sm w-full md:w-auto flex-1 bg-white border border-slate-200 shadow-sm hover:shadow-md hover:cursor-pointer transition-all duration-200">
             {error && <ErrorModal message={error} onClose={() => setError(null)} />}
-            <div className="grid grid-cols-[1fr_auto] gap-4 mt-1 p-1">
-                <div>
-                    <h3 className="text-xl font-semibold">{client.name}</h3>
-                    <p className="text-lg text-gray-600">Email: {client.email}</p>
-                    <p className="text-lg text-gray-600">Phone: {formatPhoneNumber(client.phone)}</p>
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-1 p-1">
+                <div className="flex-1 min-w-0">
+                    <h3 className="text-xl font-semibold text-slate-800 truncate">{client.name}</h3>
+                    <p className="text-base text-slate-600 mt-1 break-all">{client.email}</p>
+                    <p className="text-base text-slate-600">Phone: {formatPhoneNumber(client.phone)}</p>
                 </div>
 
-                <div className="flex space-y-4 justify-end flex-col">
+                <div className="flex flex-row sm:flex-col gap-3 sm:gap-3 justify-start sm:justify-end mt-2 sm:mt-0">
                     <button
-                        className="text-white text-center text-xl bg-gray-700 p-2 rounded-md hover:bg-gray-800 transition-colors cursor-pointer w-10 flex items-center justify-center"
+                        className="text-white text-center text-lg bg-slate-700 p-2 rounded-sm hover:bg-slate-800 transition-colors cursor-pointer w-full sm:w-9 h-9 flex items-center justify-center shadow-sm"
                         onClick={(e) => {
                             e.stopPropagation();
                             handleView();
@@ -59,7 +59,7 @@ function ClientCard({ client, refreshClients }: { client: Client; refreshClients
                     </button>
 
                     <button
-                        className="text-white font-bold text-center text-xl bg-red-500 p-2 rounded-md hover:bg-red-800 transition-colors cursor-pointer w-10 flex items-center justify-center"
+                        className="text-white font-bold text-center text-lg bg-red-500 p-2 rounded-sm hover:bg-red-600 transition-colors cursor-pointer w-full sm:w-9 h-9 flex items-center justify-center shadow-sm"
                         onClick={(e) => {
                             e.stopPropagation();
                             openModal();
