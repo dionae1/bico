@@ -1,5 +1,6 @@
 from fastapi import APIRouter, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from fastapi.responses import JSONResponse
 from app.routes import (
     auth_routes,
@@ -24,14 +25,20 @@ async def lifespan(app: FastAPI):
     print("Scheduler stopped")
 
 
-app = FastAPI(title="CSManager API", version="1.0.0", lifespan=lifespan)
+import os
+
+domain_name = os.getenv("DOMAIN_NAME", "localhost")
 
 origins = [
     "http://localhost",
-    "http://localhost:5173",
+    "https://localhost",
     "http://127.0.0.1",
-    "http://127.0.0.1:5173",
+    "https://127.0.0.1",
+    f"https://{domain_name}",
 ]
+app = FastAPI(title="CSManager API", version="1.0.0", lifespan=lifespan)
+
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 app.add_middleware(
     CORSMiddleware,
