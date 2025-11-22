@@ -24,7 +24,7 @@ const TopClientsChart = () => {
                 });
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching top clients:", error);
+                console.error("Error fetching top clients");
             } finally {
                 setLoading(false);
             }

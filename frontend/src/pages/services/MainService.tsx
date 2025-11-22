@@ -28,7 +28,7 @@ function MainService() {
             setServices(response.data);
             setServicesData(servicesData.data);
         } catch (error) {
-            console.error("Error fetching services:", error);
+            console.error("Error fetching services");
         }
     }
 

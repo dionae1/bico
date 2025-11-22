@@ -28,7 +28,7 @@ function Profile() {
                 setUser(response.data);
                 setOriginalUser(response.data);
             } catch (err) {
-                console.error("Failed to fetch profile:", err);
+                console.error("Failed to fetch profile");
                 setError("Failed to load profile.");
             } finally {
                 setLoading(false);
@@ -51,7 +51,7 @@ function Profile() {
             setError(null);
             setEditMode(false);
         } catch (err: any) {
-            console.error("Error updating profile:", err);
+            console.error("Error updating profile");
             setError(err?.response?.data?.detail || "Failed to update profile.");
             setMessage(null);
         } finally {

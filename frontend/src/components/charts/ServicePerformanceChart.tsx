@@ -18,7 +18,7 @@ const ServicePerformanceChart = () => {
                 const response = await api.get('/dashboard/top-services/?limit=5');
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching service data:", error);
+                console.error("Error fetching service data");
             } finally {
                 setLoading(false);
             }

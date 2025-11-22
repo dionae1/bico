@@ -37,7 +37,7 @@ function ServiceForm({ onCreated }: { onCreated?: () => void }) {
             }
 
         } catch (error) {
-            console.error("Error creating service:", error);
+            console.error("Error creating service");
         }
     };
 

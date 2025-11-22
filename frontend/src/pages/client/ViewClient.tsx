@@ -31,7 +31,7 @@ function ViewClient() {
                 setClientPhone(data.phone || "");
                 setClientAddress(data.address || "");
             } catch (error) {
-                console.error("Error fetching client:", error);
+                console.error("Error fetching client");
             } finally {
                 setLoading(false);
             }
@@ -49,7 +49,7 @@ function ViewClient() {
                 address: clientAddress,
             });
         } catch (error) {
-            console.error("Error updating client:", error);
+            console.error("Error updating client");
         } finally {
             setLoading(false);
         }

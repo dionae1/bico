@@ -35,7 +35,7 @@ function ViewService() {
                 setServicePeriodicity(data.periodicity || "");
                 setLoading(false);
             } catch (error) {
-                console.error("Error fetching service:", error);
+                console.error("Error fetching service");
                 setLoading(false);
             }
         };
@@ -54,7 +54,7 @@ function ViewService() {
             });
             setLoading(false);
         } catch (error) {
-            console.error("Error updating service:", error);
+            console.error("Error updating service");
             setLoading(false);
         }
     }

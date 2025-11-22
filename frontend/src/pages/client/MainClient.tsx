@@ -29,7 +29,7 @@ function MainClient() {
             setClients(response.data);
             setClientsData(clientsData.data);
         } catch (error) {
-            console.error("Error fetching clients:", error);
+            console.error("Error fetching clients");
         }
     };
 
