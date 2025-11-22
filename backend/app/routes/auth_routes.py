@@ -82,14 +82,13 @@ def demo_login(db: Session = Depends(get_db)):
 
 
 @router.post("/refresh", status_code=status.HTTP_200_OK)
-def refresh_token(request: Request):
+def refresh_token(request: Request, db: Session = Depends(get_db)):
     refresh_token = request.cookies.get("refresh_token")
     if not refresh_token or not auth.verify_refresh_token(refresh_token):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
         )
-
-    user = auth.get_current_user(token=refresh_token)
+    user = auth.get_current_user(token=refresh_token, db=db)
     access_token = auth.create_access_token(data={"sub": str(user.id)})
     refresh_token = auth.create_refresh_token(data={"sub": str(user.id)})
 
