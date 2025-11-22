@@ -17,7 +17,7 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    scheduler.add_job(cleanup_demo_accounts, "interval", hours=8)
+    scheduler.add_job(cleanup_demo_accounts, "interval", hours=1)
     scheduler.start()
     print("Scheduler started")
     yield

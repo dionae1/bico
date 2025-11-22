@@ -23,7 +23,7 @@ def test_register_duplicate(client):
     payload = {"name": existing.name, "email": existing.email, "password": "1234"}
     response = client.post(f"{URL_PREFIX}/auth/register/", json=payload)
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_409_CONFLICT
 
 
 def test_login(client):

@@ -12,6 +12,7 @@ function RevenueOverview({ data, title = "Revenue" }: { data: RevenueOverviewPro
     return (
         <MultipleItemsDashboardBase
             dataMap={[
+                ["Costs", `$${data.total_cost.toFixed(2)}`],
                 ["Expected", `$${data.total_expected_revenue.toFixed(2)}`],
                 ["Earnings", `$${data.total_revenue.toFixed(2)}`],
             ]}

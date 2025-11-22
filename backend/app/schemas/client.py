@@ -6,9 +6,9 @@ from app.models.client import Client
 class ResponseClient(BaseModel):
     id: int
     name: str
-    email: str
-    phone: str
-    address: str
+    email: str | None = None
+    phone: str | None = None
+    address: str | None = None
     status: bool
 
     @classmethod

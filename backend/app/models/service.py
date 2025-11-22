@@ -13,9 +13,9 @@ class Service(Base):
     )
     supplier_id: Mapped[int] = mapped_column(ForeignKey("suppliers.id"), nullable=True)
     name: Mapped[str] = mapped_column(String(100))
-    cost: Mapped[float] = mapped_column(Float)
+    cost: Mapped[float] = mapped_column(Float, nullable=True, default=0.0)
     price: Mapped[float] = mapped_column(Float)
-    description: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(String(200), nullable=True)
     periodicity: Mapped[str] = mapped_column(String(50))
     status: Mapped[bool] = mapped_column(default=True)
 
