@@ -18,6 +18,8 @@ function SignupPage() {
     const [invalidPassword, setInvalidPassword] = useState(true);
     const [invalidName, setInvalidName] = useState(true);
 
+    const [errorMessage, setErrorMessage] = useState("");
+
     const validateForm = () => {
         setInvalidEmail(!isValidEmail(email));
         setInvalidPassword(!isValidPassword(password));
@@ -26,6 +28,7 @@ function SignupPage() {
     };
 
     useEffect(() => {
+        setErrorMessage("");
         const timeoutId = setTimeout(() => {
             validateForm();
         }, 500);
@@ -37,12 +40,12 @@ function SignupPage() {
         e.preventDefault();
 
         if (!email || !password || !name) {
-            alert("Please enter both email and password.");
+            setErrorMessage("Please enter both email and password.");
             return;
         }
 
         if (!validateForm()) {
-            alert("Please enter valid email, password, and name.");
+            setErrorMessage("Please enter valid email, password, and name.");
             return;
         }
 
@@ -54,16 +57,17 @@ function SignupPage() {
                     navigate("/home");
                 }
             }
-
-        } catch (error) {
-            console.error("Signup failed");
+        } catch (error: any) {
+            if (error.response && error.response.status === 409) {
+                setErrorMessage("This email is already registered.");
+            }
         }
     };
 
     return (
         <>
             <div className="flex items-center justify-center h-screen bg-slate-50">
-                <div className="shadow-md p-10 rounded-sm bg-white w-full max-w-md border border-slate-200">
+                <div className="shadow-md p-10 rounded-sm bg-white w-full max-w-md mx-4 border border-slate-200">
                     <div>
                         <button
                             className="text-slate-400 text-xl font-bold hover:text-slate-600 hover:cursor-pointer float-right transition-colors"
@@ -72,10 +76,11 @@ function SignupPage() {
                     </div>
                     <div className="flex flex-col items-center justify-center mt-10 space-x-4">
                         <h1 className="text-3xl font-bold text-center text-slate-800">Create your account</h1>
-                        <h2 className="text-lg text-slate-600 mt-2">Please enter your details to sign up</h2>
+                        <h2 className="text-center text-lg text-slate-600 mt-4">Please enter your details to sign up</h2>
+                        {errorMessage && <p className="text-red-500 text-sm mt-4">{errorMessage}</p>}
                     </div>
 
-                    <form action="" className="flex flex-col justify-center m-auto mb-5 mt-10 w-full space-y-4" onSubmit={handleSignup}>
+                    <form action="" className="flex flex-col justify-center m-auto mb-5 mt-5 w-full space-y-4" onSubmit={handleSignup}>
                         <FormInput id="name" label="Name" placeholder="Name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
                         {(name && invalidName) && <p className="text-red-500 text-sm mt-1">Name must be between 8 and 50 characters and can only contain letters and spaces.</p>}
                         <FormInput id="email" label="Email" placeholder="Email" type="text" value={email} onChange={(e) => setEmail(e.target.value)} />

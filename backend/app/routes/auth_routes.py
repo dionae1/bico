@@ -53,7 +53,7 @@ def register(user_in: CreateUserRequest, db: Session = Depends(get_db)) -> Respo
     user_exists = user_service.get_user_by_email(user_in.email, db=db)
     if user_exists:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
+            status_code=status.HTTP_409_CONFLICT, detail="User already exists"
         )
 
     user = user_service.create_user(

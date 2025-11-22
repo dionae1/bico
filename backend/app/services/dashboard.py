@@ -1,9 +1,10 @@
-from datetime import timedelta
-from datetime import datetime
+from datetime import timedelta, timezone, datetime
 
 from sqlalchemy import func
 from app.db.models import Service, Client, Contract
 from sqlalchemy.orm import Session
+
+from collections import Counter
 
 
 def revenue_data(user_id: int, db: Session):
@@ -20,15 +21,16 @@ def revenue_data(user_id: int, db: Session):
     )
 
     services_with_contracts = [contract.service_id for contract in contracts]
-    total_revenue: float = sum(contract.value for contract in contracts)
-    total_expected_revenue: float = sum(
-        service.price for service in services if service.id in services_with_contracts
+    total_revenue = sum(contract.value for contract in contracts)
+
+    service_counts = Counter(contract.service_id for contract in contracts)
+
+    total_expected_revenue = sum(
+        service.price * service_counts[service.id] for service in services
     )
-    total_cost: float = sum(
-        service.cost for service in services if service.id in services_with_contracts
-    )
-    revenue: float = total_revenue - total_cost
-    profit_margin: float = (revenue / total_revenue * 100) if total_revenue > 0 else 0
+    total_cost = sum(service.cost * service_counts[service.id] for service in services)
+    revenue = total_revenue - total_cost
+    profit_margin = (revenue / total_revenue * 100) if total_revenue > 0 else 0
 
     return {
         "total_revenue": round(total_revenue, 2),
@@ -166,23 +168,20 @@ def contracts_data(user_id: int, db: Session, limit: int = 3):
         .all()
     )
 
+    now = datetime.now()
     total_contracts = len(contracts)
     active_contracts = sum(1 for contract in contracts if contract.status)
     inactive_contracts = sum(1 for contract in contracts if not contract.status)
-    finished_contracts = sum(
-        1 for contract in contracts if not contract.end_at < datetime.now()
-    )
+    finished_contracts = sum(1 for contract in contracts if contract.end_at < now)
 
     monthly_new_contracts = sum(
-        1
-        for contract in contracts
-        if contract.created_at >= datetime.now().replace(day=1)
+        1 for contract in contracts if contract.created_at >= now.replace(day=1)
     )
     end_this_month_contracts = sum(
         1
         for contract in contracts
-        if contract.end_at >= datetime.now()
-        and contract.end_at < (datetime.now().replace(day=1) + timedelta(days=30))
+        if contract.end_at >= now
+        and contract.end_at < (now.replace(day=1) + timedelta(days=30))
     )
     new_contracts_percentage: float = (
         (monthly_new_contracts / (total_contracts - monthly_new_contracts) * 100)
@@ -199,7 +198,7 @@ def contracts_data(user_id: int, db: Session, limit: int = 3):
             "value": contract.value,
         }
         for contract in contracts
-        if contract.status and contract.end_at > datetime.now()
+        if contract.status and contract.end_at > now
     ][:limit]
 
     most_profitable = (

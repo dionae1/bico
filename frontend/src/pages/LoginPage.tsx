@@ -61,7 +61,7 @@ function LoginPage() {
                 <div>
                     <button
                         className="text-slate-400 text-xl font-bold hover:text-slate-600 hover:cursor-pointer float-right transition-colors"
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate("/")}
                     >X</button>
                 </div>
                 <div className="flex flex-col items-center justify-center mt-10 space-x-4">

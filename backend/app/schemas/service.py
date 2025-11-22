@@ -7,9 +7,9 @@ class ResponseService(BaseModel):
     id: int
     supplier_id: int | None = None
     name: str
-    description: str
+    description: str | None = None
     price: float
-    cost: float
+    cost: float | None = None
     periodicity: str
     status: bool
 
