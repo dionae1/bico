@@ -22,15 +22,19 @@ function ViewClient() {
 
     useEffect(() => {
         const fetchClient = async () => {
-            setLoading(true);
-            const { data } = await api.get(`/clients/${id}`);
+            try {
+                setLoading(true);
+                const { data } = await api.get(`/clients/${id}`);
 
-            setClientName(data.name || "");
-            setClientEmail(data.email || "");
-            setClientPhone(data.phone || "");
-            setClientAddress(data.address || "");
-
-            setLoading(false);
+                setClientName(data.name || "");
+                setClientEmail(data.email || "");
+                setClientPhone(data.phone || "");
+                setClientAddress(data.address || "");
+            } catch (error) {
+                console.error("Error fetching client:", error);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchClient();
     }, []);
@@ -44,15 +48,15 @@ function ViewClient() {
                 phone: clientPhone,
                 address: clientAddress,
             });
-            setLoading(false);
         } catch (error) {
             console.error("Error updating client:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         if (isValid) {
             handleUpdate();
             navigate("/clients");

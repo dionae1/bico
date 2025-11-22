@@ -18,7 +18,7 @@ function ServicesOverview({ data }: ServicesOverviewProps) {
                 <h2 className="text-3xl font-bold text-center mb-6">Top Services</h2>
                 <ul className="flex justify-between items-center flex-wrap gap-2 gap-x-4">
                     {data.length === 0 ? (
-                        <li className="text-slate-500">No services available.</li>
+                        <li className="text-slate-500 text-center w-full">No services available - Try adding some services.</li>
                     ) : (
                         data.map((service) => (
                             <TopServiceCard key={service.id} data={service} />

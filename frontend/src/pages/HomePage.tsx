@@ -30,7 +30,7 @@ function HomePage() {
     return (
         <div className="max-w-7xl mx-auto p-6">
             <h1 className="text-3xl font-bold text-center text-slate-800">
-                Welcome back, {user ? capitalize(user.name) : "Guest"}!
+                Welcome, {user ? capitalize(user.name.split(" ")[0]) : "Guest"}!
             </h1>
 
             <div className="mt-4 mb-8">

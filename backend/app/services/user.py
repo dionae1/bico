@@ -26,7 +26,7 @@ def get_demo_user(db: Session) -> User:
     demo_email = f"demo_{uuid.uuid4().hex}@demoemail.com"
     demo_user = User(
         email=demo_email,
-        name="Demo Guest",
+        name="Guest Account",
         hashed_password=hash_password("demo_password"),
         is_demo=True,
         demo_expiration=datetime.now(timezone.utc) + timedelta(seconds=20),

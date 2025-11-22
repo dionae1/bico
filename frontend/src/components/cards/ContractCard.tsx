@@ -7,7 +7,7 @@ import ConfirmModal from "../modals/ConfirmModal";
 import ErrorModal from "../modals/ErrorModal";
 
 import api from "../../api/client";
-import Contract from "@/types/Contract";
+import { Contract } from "@/types/Contract";
 
 function ContractCard({ contract, refreshContracts }: { contract: Contract; refreshContracts: () => void }) {
     const [confirmModal, setConfirmModal] = useState(false);

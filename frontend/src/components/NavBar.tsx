@@ -41,7 +41,7 @@ function NavBar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void })
 
     const sidebarClasses = `
         fixed inset-y-0 left-0 z-30 w-64 bg-slate-50 flex flex-col border-r border-slate-200 transition-transform duration-300 ease-in-out
-        md:translate-x-0 md:static md:h-screen
+        md:translate-x-0 md:fixed md:h-screen
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
     `;
 
