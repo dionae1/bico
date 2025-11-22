@@ -1,6 +1,6 @@
 import ExpiringContractCard from "../cards/dashboard/ExpiringContractCard";
 
-import Contract from "@/types/Contract";
+import { Contract } from "@/types/Contract";
 
 interface ExpiringOverviewProps {
     data: Contract[];
@@ -12,7 +12,7 @@ function ContractsOverview({ data }: ExpiringOverviewProps) {
             <h2 className="text-3xl font-bold text-center mb-6">Expiring Soon</h2>
             <ul className="flex justify-between items-center flex-wrap gap-2 gap-x-4">
                 {data.length === 0 ? (
-                    <li className="text-slate-500">No contracts about to expire.</li>
+                    <li className="text-slate-500 text-center w-full">No active contracts - Start to create some and keep track of them here.</li>
                 ) : (
                     data.map((contract) => (
                         <ExpiringContractCard key={contract.id} data={contract} />

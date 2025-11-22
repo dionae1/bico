@@ -1,4 +1,4 @@
-import DashboardBase from "./DashboardBase";
+import MultipleItemsDashboardBase from "./MultipleItemsDashboardBase";
 
 interface ContractOverviewProps {
     total_contracts: number;
@@ -10,14 +10,12 @@ interface ContractOverviewProps {
 
 function ContractOverview({ data, title = "Contracts" }: { data: ContractOverviewProps; title?: string }) {
     return (
-        <DashboardBase
+        <MultipleItemsDashboardBase
             dataMap={[
                 ["Total", data.total_contracts],
                 ["Active", data.active_contracts],
-                // ["Expired", data.inactive_contracts],
-                // ["This Month", data.monthly_new_contracts],
             ]}
-            percentage={data.new_contracts_percentage}
+            percentage={data.total_contracts > 0 ? data.new_contracts_percentage : 0}
             title={title}
         />
     );

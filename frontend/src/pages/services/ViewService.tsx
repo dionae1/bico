@@ -21,25 +21,28 @@ function ViewService() {
 
     const isValid = (serviceName !== "" && serviceDescription !== "" && servicePrice !== "" && serviceCost !== "" && servicePeriodicity !== "");
 
-    const fetchService = async () => {
-        try {
-            setLoading(true);
-            const response = await api.get(`/services/${id}`);
-            const { data } = response;
+    useEffect(() => {
+        const fetchService = async () => {
+            try {
+                setLoading(true);
+                const response = await api.get(`/services/${id}`);
+                const { data } = response;
 
-            setServiceName(data.name || "");
-            setServiceDescription(data.description || "");
-            setServicePrice(data.price || "");
-            setServiceCost(data.cost || "");
-            setServicePeriodicity(data.periodicity || "");
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching service:", error);
-            setLoading(false);
-        }
-    }
+                setServiceName(data.name || "");
+                setServiceDescription(data.description || "");
+                setServicePrice(data.price || "");
+                setServiceCost(data.cost || "");
+                setServicePeriodicity(data.periodicity || "");
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching service:", error);
+                setLoading(false);
+            }
+        };
+        fetchService();
+    }, []);
 
-    const updateService = async () => {
+    const handleUpdate = async () => {
         try {
             setLoading(true);
             const response = await api.put(`/services/${id}`, {
@@ -60,16 +63,10 @@ function ViewService() {
         e.preventDefault();
 
         if (isValid) {
-            updateService();
+            handleUpdate();
             navigate("/services");
         }
     }
-
-    useEffect(() => {
-        if (id) {
-            fetchService();
-        }
-    }, [id]);
 
     if (loading) return <p>Loading...</p>;
 

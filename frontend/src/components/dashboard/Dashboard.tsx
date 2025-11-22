@@ -5,6 +5,10 @@ import ClientsOverview from "../cards/dashboard/ClientsOverview";
 import ContractOverview from "../cards/dashboard/ContractOverview";
 import ContractsOverview from "./ContractsOverview";
 import ServicesOverview from "./ServicesOverview";
+import RevenueChart from "../charts/RevenueChart";
+import ClientGrowthChart from "../charts/ClientGrowthChart";
+import ContractTimelineChart from "../charts/ContractTimelineChart";
+import ServicePerformanceChart from "../charts/ServicePerformanceChart";
 
 import api from "../../api/client";
 
@@ -35,9 +39,10 @@ function Dashboard() {
                 <ClientsOverview data={data["clients"]} />
                 <ContractOverview data={data["contracts"]} />
             </div>
+            <RevenueChart />
             <div className="space-y-6">
                 <ServicesOverview data={topServices} />
-                <ContractsOverview data={data["contracts"]["next_to_expire"]} />
+                <ContractsOverview data={data["contracts"]["expiring_contracts"]} />
             </div>
         </div>
     );

@@ -9,7 +9,7 @@ import ConfirmModal from "../modals/ConfirmModal";
 import ErrorModal from "../modals/ErrorModal";
 
 import api from "../../api/client";
-import Client from "@/types/Client";
+import { Client } from "@/types/Client";
 
 function ClientCard({ client, refreshClients }: { client: Client; refreshClients: () => void }) {
     const [confirmModal, setConfirmModal] = useState(false);

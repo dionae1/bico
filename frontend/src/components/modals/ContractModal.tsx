@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import Contract from "@/types/Contract";
+import { Contract } from "@/types/Contract";
 import HighlightField from "../HighlightField";
 
 interface ContractModalProps {

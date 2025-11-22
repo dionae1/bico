@@ -4,8 +4,8 @@ import FormInput from "../FormInput";
 import FormButton from "../buttons/FormButton";
 import BackButton from "../buttons/BackButton";
 
-import Service from "@/types/Service";
-import Client from "@/types/Client";
+import { Service } from "@/types/Service";
+import { Client } from "@/types/Client";
 
 import api from "../../api/client";
 

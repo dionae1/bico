@@ -7,7 +7,7 @@ import ConfirmModal from "../modals/ConfirmModal";
 import ErrorModal from "../modals/ErrorModal";
 
 import api from "../../api/client";
-import Service from "@/types/Service";
+import { Service } from "@/types/Service";
 
 function ServiceCard({ service, refreshServices }: { service: Service; refreshServices: () => void }) {
     const [confirmModal, setConfirmModal] = useState(false);

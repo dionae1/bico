@@ -8,7 +8,9 @@ class Service(Base):
     __tablename__ = "services"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
     supplier_id: Mapped[int] = mapped_column(ForeignKey("suppliers.id"), nullable=True)
     name: Mapped[str] = mapped_column(String(100))
     cost: Mapped[float] = mapped_column(Float)

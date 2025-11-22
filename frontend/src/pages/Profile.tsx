@@ -84,13 +84,13 @@ function Profile() {
 
     return (
         <div className="max-w-4xl mx-auto p-6">
-            <h1 className="text-3xl font-bold text-center text-slate-800">
-                Your Profile
+            <h1 className="text-xl font-bold text-center text-slate-800">
+                Profile Settings
             </h1>
 
             <div className="mt-10 max-w-4xl mx-auto bg-white shadow-sm rounded-sm border border-slate-200 p-10">
                 <div className="flex items-center gap-4 mb-6">
-                    <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center text-4xl text-slate-600">
+                    <div className="w-20 h-20 bg-slate-200 flex items-center justify-center text-4xl text-slate-600">
                         {user?.name ? (
                             <span>
                                 {user.name
@@ -111,8 +111,8 @@ function Profile() {
                         <div className="text-sm text-slate-500">{user?.email}</div>
                     </div>
                     <div className="flex flex-col items-end">
-                        <div className="text-sm font-bold text-slate-500 mb-2">Account</div>
-                        <div className="text-xs text-slate-400">Member</div>
+                        <div className="text-2xs font-bold text-slate-700">Account</div>
+                        <div className="text-sm text-slate-500">Member</div>
                     </div>
                 </div>
 

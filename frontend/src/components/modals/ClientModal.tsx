@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { formatPhoneNumber } from "../../services/util";
 
 import HighlightField from "../HighlightField";
-import Client from "@/types/Client";
+import { Client } from "@/types/Client";
 
 interface ClientModalProps {
     isOpen: boolean;

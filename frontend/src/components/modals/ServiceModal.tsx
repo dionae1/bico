@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 
 import HighlightField from "../HighlightField";
-import Service from "@/types/Service";
+import { Service } from "@/types/Service";
 
 interface ClientModalProps {
     isOpen: boolean;

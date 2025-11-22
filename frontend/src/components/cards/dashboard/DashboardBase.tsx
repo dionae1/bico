@@ -1,30 +1,16 @@
 import { FaAnglesUp } from "react-icons/fa6";
 
 interface DashboardBaseProps {
-    dataMap: Array<[string, number | string]>;
-    title?: string;
+    title: string;
+    data: string | number;
     percentage?: number;
 }
 
-function DashboardBase({ dataMap, title = "Dashboard Overview", percentage = 0 }: DashboardBaseProps) {
-    const n = dataMap.length;
-    const cols = n === 0 ? 1 : (n <= 3 ? n : Math.ceil(Math.sqrt(n)));
-
+function DashboardBase({ data, title = "Dashboard Overview", percentage = 0 }: DashboardBaseProps) {
     return (
-        <div className={`relative w-full rounded-sm shadow-sm border border-slate-200 p-6 bg-white flex flex-col hover:shadow-md transition-all duration-200`}>
+        <div className={`relative w-full rounded-sm shadow-sm border border-slate-200 py-6 px-4 bg-white flex flex-col hover:shadow-md transition-all duration-200`}>
             <h2 className="text-lg font-semibold text-slate-800 text-center mb-4">{title}</h2>
-
-            <div
-                className="grid gap-4 w-full mb-4"
-                style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-            >
-                {dataMap.map(([key, value]) => (
-                    <div key={key} className="flex flex-col items-center justify-center p-3">
-                        <h3 className="text-center text-sm font-medium text-slate-500 uppercase tracking-wide">{key}</h3>
-                        <p className="text-2xl font-bold text-slate-900 text-center mt-1">{value}</p>
-                    </div>
-                ))}
-            </div>
+            <p className="text-2xl font-bold text-slate-900 text-center mb-6">{data}</p>
 
             {percentage > 0 && (
                 <div className="self-end flex items-center text-emerald-500 absolute bottom-4 right-6">
