@@ -32,7 +32,7 @@ function ViewContract() {
                 setEndAt(data.end_at ? data.end_at.split('T')[0] : "");
                 setContract(data);
             } catch (error) {
-                console.error("Error fetching contracts:", error);
+                console.error("Error fetching contracts");
             } finally {
                 setLoading(false);
             }
@@ -48,7 +48,7 @@ function ViewContract() {
                 end_at: endAt
             });
         } catch (error) {
-            console.error("Error updating contract:", error);
+            console.error("Error updating contract");
         } finally {
             setLoading(false);
         }

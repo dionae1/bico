@@ -29,7 +29,7 @@ function ContractForm({ onCreated }: { onCreated?: () => void }) {
             };
             fetchServices();
         } catch (error) {
-            console.error("Error fetching services:", error);
+            console.error("Error fetching services");
         }
     }, []);
 
@@ -41,7 +41,7 @@ function ContractForm({ onCreated }: { onCreated?: () => void }) {
             };
             fetchClients();
         } catch (error) {
-            console.error("Error fetching clients:", error);
+            console.error("Error fetching clients");
         }
     }, []);
 
@@ -66,7 +66,7 @@ function ContractForm({ onCreated }: { onCreated?: () => void }) {
                 onCreated();
             }
         } catch (error) {
-            console.error("Error adding contract:", error);
+            console.error("Error creating contract");
         }
     }
 

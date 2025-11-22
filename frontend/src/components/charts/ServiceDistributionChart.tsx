@@ -20,7 +20,7 @@ const ServiceDistributionChart = () => {
                 const response = await api.get('/dashboard/top-services/?limit=5');
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching service distribution:", error);
+                console.error("Error fetching service distribution");
             } finally {
                 setLoading(false);
             }

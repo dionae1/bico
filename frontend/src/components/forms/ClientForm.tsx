@@ -35,7 +35,7 @@ function ClientForm({ onCreated }: { onCreated?: () => void }) {
             }
 
         } catch (error) {
-            console.error("Error adding client:", error);
+            console.error("Error creating client");
         }
     };
 

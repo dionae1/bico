@@ -19,7 +19,7 @@ const RevenueChart = () => {
                 const response = await api.get('/dashboard/revenue-history/');
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching revenue history:", error);
+                console.error("Error fetching revenue history");
             } finally {
                 setLoading(false);
             }

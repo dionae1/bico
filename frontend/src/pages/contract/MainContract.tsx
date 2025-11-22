@@ -28,7 +28,7 @@ function MainContract() {
             setContractsData(contractsData.data);
         } catch (error: any) {
             if (error.response.data.detail !== "No contracts found") {
-                console.error("Error fetching contracts:", error);
+                console.error("Error fetching contracts");
             }
         }
     };

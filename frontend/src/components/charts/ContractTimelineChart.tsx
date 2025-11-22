@@ -18,7 +18,7 @@ const ContractTimelineChart = () => {
                 const response = await api.get('/dashboard/contracts-history/');
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching contract history:", error);
+                console.error("Error fetching contract history");
             } finally {
                 setLoading(false);
             }

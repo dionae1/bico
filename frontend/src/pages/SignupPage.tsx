@@ -56,7 +56,7 @@ function SignupPage() {
             }
 
         } catch (error) {
-            console.error("Signup failed:", error);
+            console.error("Signup failed");
         }
     };
 

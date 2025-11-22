@@ -17,7 +17,7 @@ const ClientGrowthChart = () => {
                 const response = await api.get('/dashboard/clients-history/');
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching client history:", error);
+                console.error("Error fetching client history");
             } finally {
                 setLoading(false);
             }

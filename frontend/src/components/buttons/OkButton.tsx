@@ -1,4 +1,4 @@
-function OkButton({ onClick, label = "OK" }) {
+function OkButton({ onClick, label = "OK" }: { onClick: () => void; label?: string }) {
     return (
         <button
             onClick={onClick}
