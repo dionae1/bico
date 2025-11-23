@@ -3,15 +3,16 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Bico Repository"
+    PROJECT_NAME: str = "Bico Dev"
     DOMAIN_NAME: str = "localhost"
 
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
-    DATABASE_URL: str
+    HOST_NAME: str = "localhost"
+    DATABASE_URL: Optional[str] = None
 
-    SECRET_KEY: str
+    SECRET_KEY: str = "development-key"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
