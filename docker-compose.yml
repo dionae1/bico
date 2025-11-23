@@ -28,8 +28,8 @@ services:
     image: postgres:16
     container_name: postgres
     environment:
-      - POSTGRES_DB=${POSTGRES_DB:-default}
-      - POSTGRES_USER=${POSTGRES_USER:-user}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
