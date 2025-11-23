@@ -1,5 +1,8 @@
-# BiCO - Freelancer Management System
+# <center>BiCO - Freelancer Management System</center>
 
+### <center>[Available at bicoapp.me](bicoapp.me)</center>
+
+##
 Welcome to the **BiCO** repository. This is a Full Stack project designed to help freelancers manage their business by centralizing control over clients, services, contracts.
 
 The focus of this project lies in acquiring experience in modern web development, focused on backend, software architecture, and containerization.
