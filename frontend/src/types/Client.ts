@@ -2,11 +2,11 @@ export interface Client {
     id: number;
     user_id: number;
     name: string;
-    email: string;
-    phone: string;
-    address: string;
-    status: boolean;
-    created_at: string;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    status: boolean | null;
+    created_at: string | null;
 }
 
 export type ClientsData = {
