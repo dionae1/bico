@@ -12,7 +12,7 @@ function ClientForm({ onCreated }: { onCreated?: () => void }) {
     const [clientPhone, setClientPhone] = useState("")
     const [clientAddress, setClientAddress] = useState("")
 
-    const isValid = (clientName !== "" && clientEmail !== "" && clientPhone !== "" && clientAddress !== "")
+    const isValid = (clientName !== "")
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

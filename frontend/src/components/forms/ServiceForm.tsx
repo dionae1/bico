@@ -13,7 +13,7 @@ function ServiceForm({ onCreated }: { onCreated?: () => void }) {
     const [serviceCost, setServiceCost] = useState("");
     const [servicePeriodity, setServicePeriodicity] = useState("");
 
-    const isValid = (serviceName !== "" && serviceDescription !== "" && servicePrice !== "" && serviceCost !== "" && servicePeriodity !== "");
+    const isValid = (serviceName !== "" && servicePrice !== "" && servicePeriodity !== "");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
