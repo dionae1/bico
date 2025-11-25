@@ -19,7 +19,7 @@ function ViewService() {
     const [serviceCost, setServiceCost] = useState("");
     const [servicePeriodicity, setServicePeriodicity] = useState("");
 
-    const isValid = (serviceName !== "" && serviceDescription !== "" && servicePrice !== "" && serviceCost !== "" && servicePeriodicity !== "");
+    const isValid = (serviceName !== "" && servicePrice !== "" && servicePeriodicity !== "");
 
     useEffect(() => {
         const fetchService = async () => {
