@@ -2,9 +2,9 @@ export interface Service {
     id: number;
     user_id: number;
     name: string;
-    description: string;
+    description: string | null;
     price: number;
-    cost: number;
+    cost: number | null;
     periodicity: "monthly" | "weekly" | "yearly" | "one-time";
     status: boolean;
 }

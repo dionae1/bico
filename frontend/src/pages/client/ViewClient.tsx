@@ -18,7 +18,7 @@ function ViewClient() {
     const [clientPhone, setClientPhone] = useState<string>("");
     const [clientAddress, setClientAddress] = useState<string>("");
 
-    const isValid = (clientName !== "" && clientEmail !== "" && clientPhone !== "" && clientAddress !== "");
+    const isValid = (clientName !== "");
 
     useEffect(() => {
         const fetchClient = async () => {
