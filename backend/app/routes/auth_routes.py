@@ -32,8 +32,8 @@ def login(user_in: LoginUserRequest, db: Session = Depends(get_db)):
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False,
-        samesite=None,
+        secure=True,
+        samesite="Lax",
         max_age=24 * 60 * 60,
         path="/api/v1/auth/refresh",
     )
@@ -102,10 +102,9 @@ def refresh_token(request: Request, db: Session = Depends(get_db)):
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False,
-        samesite=None,
+        secure=True,
+        samesite="Lax",
         max_age=24 * 60 * 60,
         path="/api/v1/auth/refresh",
     )
-
     return response
