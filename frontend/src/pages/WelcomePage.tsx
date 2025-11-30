@@ -42,11 +42,10 @@ function WelcomePage() {
             <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6'}`}>
                 <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">B</div>
                         <span className="text-2xl font-bold text-slate-900 tracking-tight">BiCO</span>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Link to="/login" className="text-slate-600 hover:text-emerald-600 font-medium transition-colors hidden sm:block">
+                        <Link to="/login" className="text-slate-600 hover:text-emerald-600 font-medium transition-colors border rounded-lg p-2 sm:border-none">
                             Log in
                         </Link>
                         <Link
@@ -236,7 +235,6 @@ function WelcomePage() {
                     <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
                         <div className="max-w-md text-center md:text-left">
                             <div className="flex items-center justify-center md:justify-start gap-2 mb-6">
-                                <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">B</div>
                                 <span className="text-2xl font-bold text-slate-900">BiCO</span>
                             </div>
                             <p className="text-slate-500 mb-6">
