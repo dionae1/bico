@@ -24,7 +24,7 @@ function ContractModal({ isOpen, onClose, contract }: ContractModalProps) {
             onClick={onClose}
         >
             <div
-                className={'bg-white p-6 rounded-sm w-11/12 md:w-auto md:min-w-[400px] shadow-xl relative'}
+                className={'bg-white p-6 rounded-sm w-11/12 md:w-auto md:min-w-[600px] shadow-xl relative'}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="absolute top-4 right-4 text-xl">
@@ -34,10 +34,12 @@ function ContractModal({ isOpen, onClose, contract }: ContractModalProps) {
                     <h2 className="text-2xl font-semibold mb-6 text-center text-slate-800">{`${contract.client.name.split(" ")[0]} X ${contract.service.name}`}</h2>
                     <h3 className="text-lg font-medium text-slate-700 border-b border-slate-100 pb-1">Client</h3>
                     <HighlightField legend="Name" text={contract.client.name} />
-                    <HighlightField legend="Email" text={contract.client.email} />
+                    <HighlightField legend="Email" text={contract.client.email || "N/A"} />
                     <h3 className="text-lg font-medium text-slate-700 border-b border-slate-100 pb-1 mt-4">Service</h3>
                     <HighlightField legend="Name" text={contract.service.name} />
-                    <HighlightField legend="Description" text={contract.service.description} />
+                    <HighlightField legend="Description" text={contract.service.description || ""} />
+                    <HighlightField legend="Value" text={`U$ ${contract.value.toFixed(2)}`} />
+                    <HighlightField legend="End Date" text={new Date(contract.end_at).toLocaleDateString()} />
                 </div>
             </div>
         </div>

@@ -44,54 +44,74 @@ const RevenueChart = () => {
                             bottom: 0,
                         }}
                     >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                        <defs>
+                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                            </linearGradient>
+                            <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                            </linearGradient>
+                            <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                         <XAxis
                             dataKey="month"
-                            stroke="#64748b"
+                            stroke="#94a3b8"
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
+                            dy={10}
                         />
                         <YAxis
-                            stroke="#64748b"
+                            stroke="#94a3b8"
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
                             tickFormatter={(value) => `$${value}`}
+                            dx={-10}
                         />
                         <Tooltip
                             contentStyle={{
                                 backgroundColor: '#fff',
-                                borderRadius: '4px',
-                                border: '1px solid #e2e8f0',
-                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                             }}
-                            itemStyle={{ color: '#1e293b' }}
+                            itemStyle={{ color: '#1e293b', fontSize: '12px', fontWeight: 500 }}
+                            labelStyle={{ color: '#64748b', marginBottom: '0.5rem' }}
                         />
-                        <Legend />
+                        <Legend wrapperStyle={{ paddingTop: '20px' }} />
                         <Area
                             type="monotone"
                             dataKey="revenue"
                             stroke="#10b981"
-                            fill="#10b981"
+                            strokeWidth={2}
+                            fillOpacity={1}
+                            fill="url(#colorRevenue)"
                             name="Revenue"
-                            fillOpacity={0.2}
                         />
                         <Area
                             type="monotone"
                             dataKey="cost"
                             stroke="#ef4444"
-                            fill="#ef4444"
+                            strokeWidth={2}
+                            fillOpacity={1}
+                            fill="url(#colorCost)"
                             name="Cost"
-                            fillOpacity={0.2}
                         />
                         <Area
                             type="monotone"
                             dataKey="profit"
                             stroke="#3b82f6"
-                            fill="#3b82f6"
+                            strokeWidth={2}
+                            fillOpacity={1}
+                            fill="url(#colorProfit)"
                             name="Profit"
-                            fillOpacity={0.2}
                         />
                     </AreaChart>
                 </ResponsiveContainer>

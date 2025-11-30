@@ -8,7 +8,7 @@ interface ServiceData {
     popularity_percentage: number;
 }
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 const ServiceDistributionChart = () => {
     const [data, setData] = useState<ServiceData[]>([]);
@@ -41,24 +41,30 @@ const ServiceDistributionChart = () => {
                             data={data as any}
                             cx="50%"
                             cy="50%"
-                            labelLine={false}
-                            outerRadius={100}
-                            fill="#8884d8"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
                             dataKey="contracts_count"
                         >
                             {data.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} strokeWidth={0} />
                             ))}
                         </Pie>
                         <Tooltip
                             contentStyle={{
                                 backgroundColor: '#fff',
-                                borderRadius: '4px',
-                                border: '1px solid #e2e8f0',
-                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                             }}
+                            itemStyle={{ color: '#1e293b', fontSize: '12px', fontWeight: 500 }}
                         />
-                        <Legend />
+                        <Legend
+                            layout="vertical"
+                            verticalAlign="middle"
+                            align="right"
+                            wrapperStyle={{ fontSize: '12px' }}
+                        />
                     </PieChart>
                 </ResponsiveContainer>
             </div>

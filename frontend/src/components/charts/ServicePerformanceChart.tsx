@@ -43,11 +43,12 @@ const ServicePerformanceChart = () => {
                             left: 40,
                             bottom: 0,
                         }}
+                        barGap={2}
                     >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                         <XAxis
                             type="number"
-                            stroke="#64748b"
+                            stroke="#94a3b8"
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
@@ -63,28 +64,29 @@ const ServicePerformanceChart = () => {
                             width={100}
                         />
                         <Tooltip
-                            cursor={{ fill: '#f1f5f9' }}
+                            cursor={{ fill: '#f8fafc' }}
                             contentStyle={{
                                 backgroundColor: '#fff',
-                                borderRadius: '4px',
-                                border: '1px solid #e2e8f0',
-                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                             }}
+                            itemStyle={{ color: '#1e293b', fontSize: '12px', fontWeight: 500 }}
                         />
-                        <Legend />
+                        <Legend wrapperStyle={{ paddingTop: '20px' }} />
                         <Bar
                             dataKey="revenue"
                             name="Revenue"
                             fill="#10b981"
                             radius={[0, 4, 4, 0]}
-                            maxBarSize={25}
+                            maxBarSize={20}
                         />
                         <Bar
                             dataKey="cost"
                             name="Cost"
                             fill="#ef4444"
                             radius={[0, 4, 4, 0]}
-                            maxBarSize={25}
+                            maxBarSize={20}
                         />
                     </BarChart>
                 </ResponsiveContainer>
