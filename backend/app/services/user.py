@@ -71,7 +71,7 @@ def get_demo_user(db: Session) -> User:
             end_at=datetime.now(timezone.utc) + timedelta(days=15 * (i + 1)),
             created_at=datetime.now(timezone.utc) - timedelta(days=15 * (i + 1)),
             user_id=demo_user.id,
-            value=demo_services[i].price * random.uniform(1.0, 1.2),
+            value=round(demo_services[i].price * random.uniform(1.0, 1.2), 2),
         )
         demo_contracts.append(contract)
     db.add_all(demo_contracts)

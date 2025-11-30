@@ -9,7 +9,7 @@ interface TopClientData {
     contracts_count: number;
 }
 
-const COLORS = ['#10b981', '#059669', '#047857', '#065f46', '#064e3b'];
+const COLORS = ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5'];
 
 const TopClientsChart = () => {
     const [data, setData] = useState<TopClientData[]>([]);
@@ -50,10 +50,10 @@ const TopClientsChart = () => {
                             bottom: 0,
                         }}
                     >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                         <XAxis
                             type="number"
-                            stroke="#64748b"
+                            stroke="#94a3b8"
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
@@ -69,14 +69,15 @@ const TopClientsChart = () => {
                             width={100}
                         />
                         <Tooltip
-                            cursor={{ fill: '#f1f5f9' }}
+                            cursor={{ fill: '#f8fafc' }}
                             contentStyle={{
                                 backgroundColor: '#fff',
-                                borderRadius: '4px',
-                                border: '1px solid #e2e8f0',
-                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                             }}
                             formatter={(value: number) => [`$${value.toFixed(2)}`, 'Total Spent']}
+                            itemStyle={{ color: '#1e293b', fontSize: '12px', fontWeight: 500 }}
                         />
                         <Bar
                             dataKey="total_spent"

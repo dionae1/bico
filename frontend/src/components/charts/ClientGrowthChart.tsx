@@ -42,35 +42,45 @@ const ClientGrowthChart = () => {
                             bottom: 0,
                         }}
                     >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                        <defs>
+                            <linearGradient id="colorClientGrowth" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#10b981" stopOpacity={1} />
+                                <stop offset="100%" stopColor="#10b981" stopOpacity={0.6} />
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                         <XAxis
                             dataKey="month"
-                            stroke="#64748b"
+                            stroke="#94a3b8"
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
+                            dy={10}
                         />
                         <YAxis
-                            stroke="#64748b"
+                            stroke="#94a3b8"
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
                             allowDecimals={false}
+                            dx={-10}
                         />
                         <Tooltip
-                            cursor={{ fill: '#f1f5f9' }}
+                            cursor={{ fill: '#f8fafc' }}
                             contentStyle={{
                                 backgroundColor: '#fff',
-                                borderRadius: '4px',
-                                border: '1px solid #e2e8f0',
-                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                             }}
+                            itemStyle={{ color: '#1e293b', fontSize: '12px', fontWeight: 500 }}
+                            labelStyle={{ color: '#64748b', marginBottom: '0.5rem' }}
                         />
-                        <Legend />
+                        <Legend wrapperStyle={{ paddingTop: '20px' }} />
                         <Bar
                             dataKey="count"
                             name="New Clients"
-                            fill="#10b981"
+                            fill="url(#colorClientGrowth)"
                             radius={[4, 4, 0, 0]}
                             maxBarSize={50}
                         />
