@@ -74,6 +74,13 @@ The project includes a `Makefile` to simplify the development environment setup.
 *   Docker & Docker Compose (Production/demo)
 *   Node.js & Python 3.12 (Local development)
 
+### Installation
+
+```bash
+git clone https://github.com/dionae1/bico.git bico-repo
+cd bico-repo
+```
+
 ### Run Via Docker
 
 To start the entire environment:
