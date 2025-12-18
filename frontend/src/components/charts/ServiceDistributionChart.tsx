@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart } from '@mui/x-charts/PieChart';
 import api from '../../api/client';
 
 interface ServiceData {
     name: string;
     contracts_count: number;
     popularity_percentage: number;
+    [key: string]: string | number;
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
@@ -34,39 +35,26 @@ const ServiceDistributionChart = () => {
     return (
         <div className="bg-white p-6 rounded-sm shadow-sm border border-slate-200">
             <h3 className="text-xl font-semibold text-slate-800 mb-4">Service Popularity Distribution</h3>
-            <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie
-                            data={data as any}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
-                            dataKey="contracts_count"
-                        >
-                            {data.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} strokeWidth={0} />
-                            ))}
-                        </Pie>
-                        <Tooltip
-                            contentStyle={{
-                                backgroundColor: '#fff',
-                                borderRadius: '8px',
-                                border: 'none',
-                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                            }}
-                            itemStyle={{ color: '#1e293b', fontSize: '12px', fontWeight: 500 }}
-                        />
-                        <Legend
-                            layout="vertical"
-                            verticalAlign="middle"
-                            align="right"
-                            wrapperStyle={{ fontSize: '12px' }}
-                        />
-                    </PieChart>
-                </ResponsiveContainer>
+            <div className="h-64 w-full flex justify-center">
+                <PieChart
+                    series={[
+                        {
+                            data: data.map((item, index) => ({
+                                id: index,
+                                value: item.contracts_count,
+                                label: item.name,
+                                color: COLORS[index % COLORS.length],
+                            })),
+                            innerRadius: 60,
+                            outerRadius: 100,
+                            paddingAngle: 5,
+                            cornerRadius: 5,
+                            highlightScope: { fade: 'global', highlight: 'item' },
+                            faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                        },
+                    ]}
+                    height={250}
+                />
             </div>
         </div>
     );

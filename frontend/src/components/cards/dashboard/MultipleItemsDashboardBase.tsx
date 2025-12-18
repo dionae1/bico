@@ -21,7 +21,7 @@ function MultipleItemsDashboardBase({ dataMap, title = "Dashboard Overview", per
                 {dataMap.map(([key, value]) => (
                     <div key={key} className="flex flex-col items-center justify-center p-3">
                         <h3 className="text-center text-sm font-medium text-slate-500 uppercase tracking-wide">{key}</h3>
-                        <p className="text-2xl font-bold text-slate-900 text-center mt-1">{value}</p>
+                        <p className="text-xl font-bold text-slate-900 text-center mt-1 p-2">{value}</p>
                     </div>
                 ))}
             </div>
