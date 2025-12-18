@@ -1,34 +1,34 @@
-from datetime import timedelta, timezone, datetime
-
-from sqlalchemy import func
-from app.db.models import Service, Client, Contract
+from sqlalchemy import text
 from sqlalchemy.orm import Session
-
-from collections import Counter
 
 
 def revenue_data(user_id: int, db: Session):
-    contracts: list[Contract] = (
-        db.query(Contract)
-        .filter(Contract.status == True, Contract.user_id == user_id)
-        .all()
+    query = text(
+        """
+        SELECT 
+            COALESCE(SUM(c.value), 0) AS total_revenue,
+            COALESCE(SUM(s.cost), 0) AS total_cost,
+            COALESCE(SUM(s.price), 0) AS total_expected_revenue
+        FROM contracts c
+        JOIN services s ON c.service_id = s.id
+        WHERE c.status = true AND c.user_id = :user_id
+        """
     )
 
-    services: list[Service] = (
-        db.query(Service)
-        .filter(Service.status == True, Service.user_id == user_id)
-        .all()
-    )
+    result = db.execute(query, {"user_id": user_id}).fetchone()
 
-    services_with_contracts = [contract.service_id for contract in contracts]
-    total_revenue = sum(contract.value for contract in contracts)
+    if not result:
+        return {
+            "total_revenue": 0.0,
+            "total_expected_revenue": 0.0,
+            "total_cost": 0.0,
+            "revenue": 0.0,
+            "profit_margin": 0.0,
+        }
 
-    service_counts = Counter(contract.service_id for contract in contracts)
-
-    total_expected_revenue = sum(
-        service.price * service_counts[service.id] for service in services
-    )
-    total_cost = sum(service.cost * service_counts[service.id] for service in services)
+    total_revenue = float(result.total_revenue or 0)
+    total_expected_revenue = float(result.total_expected_revenue or 0)
+    total_cost = float(result.total_cost or 0)
     revenue = total_revenue - total_cost
     profit_margin = (revenue / total_revenue * 100) if total_revenue > 0 else 0
 
@@ -42,19 +42,25 @@ def revenue_data(user_id: int, db: Session):
 
 
 def revenue_history(user_id: int, db: Session):
-    results = (
-        db.query(
-            func.to_char(Contract.created_at, "YYYY-MM").label("month"),
-            func.sum(Contract.value).label("revenue"),
-            func.sum(Service.cost).label("cost"),
-            (func.sum(Contract.value) - func.sum(Service.cost)).label("profit"),
-        )
-        .join(Service, Service.id == Contract.service_id)
-        .filter(Contract.user_id == user_id)
-        .group_by("month")
-        .order_by("month")
-        .all()
+    query = text(
+        """
+        SELECT 
+            to_char(c.created_at, 'YYYY-MM') AS month,
+            COALESCE(SUM(c.value), 0) AS revenue,
+            COALESCE(SUM(s.cost), 0) AS cost,
+            (COALESCE(SUM(c.value), 0) - COALESCE(SUM(s.cost), 0)) AS profit
+        FROM contracts c
+        JOIN services s ON c.service_id = s.id
+        WHERE c.user_id = :user_id
+        GROUP BY month
+        ORDER BY month
+        """
     )
+
+    results = db.execute(query, {"user_id": user_id}).fetchall()
+
+    if not results:
+        return []
 
     history = [
         {
@@ -70,84 +76,129 @@ def revenue_history(user_id: int, db: Session):
 
 
 def clients_data(user_id: int, db: Session):
-    clients = db.query(Client).filter(Client.user_id == user_id).all()
-    total_clients = len(clients)
-    clients_with_contracts = sum(1 for client in clients if client.contracts)
-    clients_without_contracts = total_clients - clients_with_contracts
-
-    monthly_new_clients = sum(
-        1 for client in clients if client.created_at >= datetime.now().replace(day=1)
+    clients_query = text(
+        """
+        SELECT 
+            COUNT(*) AS total_clients,
+            SUM(CASE WHEN EXISTS (SELECT 1 FROM contracts c WHERE c.client_id = cl.id) THEN 1 ELSE 0 END) AS clients_with_contracts,
+            SUM(CASE WHEN NOT EXISTS (SELECT 1 FROM contracts c WHERE c.client_id = cl.id) THEN 1 ELSE 0 END) AS clients_without_contracts,
+            SUM(CASE WHEN cl.created_at >= date_trunc('month', CURRENT_DATE) THEN 1 ELSE 0 END) AS monthly_new_clients
+        FROM clients cl
+        WHERE cl.user_id = :user_id
+        """
     )
+    clients_results = db.execute(clients_query, {"user_id": user_id}).fetchone()
+
+    most_contracts_query = text(
+        """
+        SELECT cl.name
+        FROM clients cl
+        JOIN contracts c ON c.client_id = cl.id
+        WHERE cl.user_id = :user_id
+        GROUP BY cl.id
+        ORDER BY COUNT(c.id) DESC
+        LIMIT 1
+        """
+    )
+    most_contracts_result = db.execute(
+        most_contracts_query, {"user_id": user_id}
+    ).fetchone()
+
+    most_valuable_query = text(
+        """
+        SELECT cl.name
+        FROM clients cl
+        JOIN contracts c ON c.client_id = cl.id
+        WHERE cl.user_id = :user_id
+        GROUP BY cl.id
+        ORDER BY SUM(c.value) DESC
+        LIMIT 1
+        """
+    )
+    most_valuable_result = db.execute(
+        most_valuable_query, {"user_id": user_id}
+    ).fetchone()
 
     new_clients_percentage: float = (
-        (monthly_new_clients / (total_clients - monthly_new_clients) * 100)
-        if (total_clients - monthly_new_clients) > 0
-        else 100
-    )
-
-    most_contracts = (
-        db.query(Client)
-        .join(Contract, Contract.client_id == Client.id)
-        .filter(Client.user_id == user_id)
-        .group_by(Client.id)
-        .order_by(func.count(Contract.id).desc())
-        .first()
-    )
-
-    most_valuable = (
-        db.query(
-            Client,
+        (
+            (
+                clients_results.monthly_new_clients
+                / (clients_results.total_clients - clients_results.monthly_new_clients)
+                * 100
+            )
+            if (clients_results.total_clients - clients_results.monthly_new_clients) > 0
+            else 100
         )
-        .join(Contract, Contract.client_id == Client.id)
-        .filter(Client.user_id == user_id)
-        .group_by(Client.id)
-        .order_by(func.sum(Contract.value).desc())
-        .first()
+        if clients_results
+        else 0
     )
 
     return {
-        "total_clients": total_clients,
-        "clients_with_contracts": clients_with_contracts,
-        "clients_without_contracts": clients_without_contracts,
-        "monthly_new_clients": monthly_new_clients,
+        "total_clients": clients_results.total_clients if clients_results else 0,
+        "clients_with_contracts": (
+            clients_results.clients_with_contracts if clients_results else 0
+        ),
+        "clients_without_contracts": (
+            clients_results.clients_without_contracts if clients_results else 0
+        ),
+        "monthly_new_clients": (
+            clients_results.monthly_new_clients if clients_results else 0
+        ),
         "new_clients_percentage": round(new_clients_percentage, 2),
-        "most_contracts": most_contracts.name if most_contracts else None,
-        "most_valuable": most_valuable.name if most_valuable else None,
+        "most_contracts": most_contracts_result.name if most_contracts_result else None,
+        "most_valuable": most_valuable_result.name if most_valuable_result else None,
     }
 
 
 def clients_history(user_id: int, db: Session):
-    results = (
-        db.query(
-            func.to_char(Client.created_at, "YYYY-MM").label("month"),
-            func.count(Client.id).label("count"),
-        )
-        .filter(Client.user_id == user_id)
-        .group_by("month")
-        .order_by("month")
-        .all()
+    query = text(
+        """
+        SELECT 
+            to_char(created_at, 'YYYY-MM') AS month,
+            COUNT(id) AS count
+        FROM clients
+        WHERE user_id = :user_id
+        GROUP BY month
+        ORDER BY month
+        """
     )
 
-    history = [{"month": row.month, "count": row.count} for row in results]
+    results = db.execute(query, {"user_id": user_id}).fetchall()
+
+    if not results:
+        return []
+
+    history = [
+        {
+            "month": row.month,
+            "count": row.count,
+        }
+        for row in results
+    ]
 
     return history
 
 
 def top_clients(user_id: int, db: Session, limit: int = 5):
-    rows = (
-        db.query(
-            Client.id,
-            Client.name,
-            func.count(Contract.id).label("contracts_count"),
-            func.sum(Contract.value).label("total_spent"),
-        )
-        .filter(Client.user_id == user_id)
-        .join(Contract, Contract.client_id == Client.id)
-        .group_by(Client.id, Client.name)
-        .order_by(func.sum(Contract.value).desc())
-        .limit(limit)
-        .all()
+    query = text(
+        """
+        SELECT
+            cl.id,
+            cl.name,
+            COUNT(c.id) AS contracts_count,
+            SUM(c.value) AS total_spent
+        FROM clients cl
+        JOIN contracts c ON c.client_id = cl.id
+        WHERE cl.user_id = :user_id
+        GROUP BY cl.id, cl.name
+        ORDER BY total_spent DESC
+        LIMIT :limit
+        """
     )
+
+    results = db.execute(query, {"user_id": user_id, "limit": limit}).fetchall()
+    if not results:
+        return []
 
     return [
         {
@@ -156,89 +207,115 @@ def top_clients(user_id: int, db: Session, limit: int = 5):
             "contracts_count": row.contracts_count,
             "total_spent": row.total_spent,
         }
-        for row in rows
+        for row in results
     ]
 
 
 def contracts_data(user_id: int, db: Session, limit: int = 3):
-    contracts: list[Contract] = (
-        db.query(Contract)
-        .filter(Contract.user_id == user_id)
-        .order_by(Contract.end_at)
-        .all()
+    query = text(
+        """
+        SELECT 
+            COUNT(*) AS total_contracts,
+            SUM(CASE WHEN status = true THEN 1 ELSE 0 END) AS active_contracts,
+            SUM(CASE WHEN status = false THEN 1 ELSE 0 END) AS inactive_contracts,
+            SUM(CASE WHEN created_at >= date_trunc('month', CURRENT_DATE) THEN 1 ELSE 0 END) AS monthly_new_contracts,
+            SUM(CASE WHEN end_at >= CURRENT_DATE AND end_at < (date_trunc('month', CURRENT_DATE) + INTERVAL '1 month') THEN 1 ELSE 0 END) AS end_this_month_contracts,
+            SUM(CASE WHEN end_at < CURRENT_DATE THEN 1 ELSE 0 END) AS finished_contracts
+        FROM contracts
+        WHERE user_id = :user_id
+        """
     )
+    results = db.execute(query, {"user_id": user_id}).fetchone()
 
-    now = datetime.now()
-    total_contracts = len(contracts)
-    active_contracts = sum(1 for contract in contracts if contract.status)
-    inactive_contracts = sum(1 for contract in contracts if not contract.status)
-    finished_contracts = sum(1 for contract in contracts if contract.end_at < now)
-
-    monthly_new_contracts = sum(
-        1 for contract in contracts if contract.created_at >= now.replace(day=1)
-    )
-    end_this_month_contracts = sum(
-        1
-        for contract in contracts
-        if contract.end_at >= now
-        and contract.end_at < (now.replace(day=1) + timedelta(days=30))
-    )
     new_contracts_percentage: float = (
-        (monthly_new_contracts / (total_contracts - monthly_new_contracts) * 100)
-        if (total_contracts - monthly_new_contracts) > 0
-        else 100
-    )
-
-    expiring_contracts = [
-        {
-            "id": contract.id,
-            "client": contract.client,
-            "service": contract.service,
-            "end_at": contract.end_at,
-            "value": contract.value,
-        }
-        for contract in contracts
-        if contract.status and contract.end_at > now
-    ][:limit]
-
-    most_profitable = (
-        db.query(
-            Contract,
-            (Contract.value - Service.cost).label("profit"),
+        (
+            (
+                results.monthly_new_contracts
+                / (results.total_contracts - results.monthly_new_contracts)
+                * 100
+            )
+            if (results.total_contracts - results.monthly_new_contracts) > 0
+            else 100
         )
-        .join(Service, Service.id == Contract.service_id)
-        .filter(Contract.user_id == user_id)
-        .order_by((Contract.value - Service.cost).desc())
-        .first()
+        if results
+        else 0
+    )
+    most_profitable_query = text(
+        """
+        SELECT c.id, s.name, (c.value - s.cost) AS profit
+        FROM contracts c
+        JOIN services s ON c.service_id = s.id
+        WHERE c.user_id = :user_id
+        ORDER BY profit DESC
+        LIMIT 1
+        """
+    )
+    most_profitable = db.execute(most_profitable_query, {"user_id": user_id}).fetchone()
+
+    expiring_contracts_query = text(
+        """
+        SELECT c.id, cl.name AS client_name, cl.id as client_id, s.name AS service_name, s.price AS service_price, c.end_at, c.value
+        FROM contracts c
+        JOIN clients cl ON c.client_id = cl.id
+        JOIN services s ON c.service_id = s.id
+        WHERE c.user_id = :user_id AND c.status = true AND c.end_at > CURRENT_DATE
+        ORDER BY c.end_at
+        LIMIT :limit
+        """
+    )
+    expiring_contracts_results = db.execute(
+        expiring_contracts_query, {"user_id": user_id, "limit": limit}
+    ).fetchall()
+
+    expiring_contracts = (
+        [
+            {
+                "id": row.id,
+                "client": {"id": row.client_id, "name": row.client_name},
+                "service": {
+                    "name": row.service_name,
+                    "price": round(float(row.service_price), 2),
+                    "status": "true",
+                },
+                "end_at": row.end_at,
+                "value": row.value,
+            }
+            for row in expiring_contracts_results
+        ]
+        if expiring_contracts_results
+        else []
     )
 
     return {
-        "total_contracts": total_contracts,
-        "active_contracts": active_contracts,
-        "inactive_contracts": inactive_contracts,
-        "monthly_new_contracts": monthly_new_contracts,
+        "total_contracts": results.total_contracts if results else 0,
+        "active_contracts": results.active_contracts if results else 0,
+        "inactive_contracts": results.inactive_contracts if results else 0,
+        "monthly_new_contracts": results.monthly_new_contracts if results else 0,
         "new_contracts_percentage": round(new_contracts_percentage, 2),
-        "most_profitable": (
-            most_profitable.Contract.service.name if most_profitable else None
-        ),
+        "most_profitable": most_profitable.name if most_profitable else None,
+        "end_this_month_contracts": results.end_this_month_contracts if results else 0,
+        "finished_contracts": results.finished_contracts if results else 0,
         "expiring_contracts": expiring_contracts,
-        "end_this_month_contracts": end_this_month_contracts,
-        "finished_contracts": finished_contracts,
     }
 
 
 def contracts_history(user_id: int, db: Session):
-    results = (
-        db.query(
-            func.to_char(Contract.created_at, "YYYY-MM").label("month"),
-            func.count(Contract.id).label("count"),
-            func.sum(Contract.value).label("value_at_risk"),
-        )
-        .filter(Contract.user_id == user_id)
-        .group_by("month")
-        .order_by("month")
-        .all()
+    query = text(
+        """
+        SELECT 
+            to_char(created_at, 'YYYY-MM') AS month,
+            COUNT(id) AS count,
+            SUM(value) AS value_at_risk
+        FROM contracts
+        WHERE user_id = :user_id
+        GROUP BY month
+        ORDER BY month
+        """
     )
+
+    results = db.execute(query, {"user_id": user_id}).fetchall()
+    if not results:
+        return []
 
     history = [
         {
@@ -253,81 +330,123 @@ def contracts_history(user_id: int, db: Session):
 
 
 def services_data(user_id: int, db: Session):
-    services = db.query(Service).filter(Service.user_id == user_id).all()
-    total_services = len(services)
-    services_with_contracts = sum(1 for service in services if service.contracts)
-    services_without_contracts = total_services - services_with_contracts
-    most_sold = (
-        db.query(Service)
-        .join(Contract, Contract.service_id == Service.id)
-        .filter(Service.user_id == user_id)
-        .group_by(Service.id)
-        .order_by(func.count(Contract.id).desc())
-        .first()
+    query = text(
+        """
+        SELECT 
+            COUNT(s.id) AS total_services,
+            SUM(CASE WHEN EXISTS (SELECT 1 FROM contracts c WHERE c.service_id = s.id) THEN 1 ELSE 0 END) AS services_with_contracts,
+            SUM(CASE WHEN NOT EXISTS (SELECT 1 FROM contracts c WHERE c.service_id = s.id) THEN 1 ELSE 0 END) AS services_without_contracts
+        FROM services s
+        WHERE s.user_id = :user_id
+        """
     )
-    most_profitable = (
-        db.query(
-            Service,
-        )
-        .join(Contract, Contract.service_id == Service.id)
-        .filter(Service.user_id == user_id)
-        .group_by(Service.id)
-        .order_by(func.sum(Contract.value) - func.sum(Service.cost).desc())
-        .first()
+    results = db.execute(query, {"user_id": user_id}).fetchone()
+
+    most_sold_query = text(
+        """
+        SELECT s.name
+        FROM services s
+        JOIN contracts c ON c.service_id = s.id
+        WHERE s.user_id = :user_id
+        GROUP BY s.id
+        ORDER BY COUNT(c.id) DESC
+        LIMIT 1
+        """
     )
-    most_sold_monthly = (
-        db.query(
-            Service,
-            func.count(Contract.id).label("monthly_count"),
-            func.to_char(Contract.created_at, "YYYY-MM").label("month"),
-        )
-        .join(Contract, Contract.service_id == Service.id)
-        .filter(Service.user_id == user_id)
-        .group_by(Service.id, "month")
-        .order_by("month")
-        .all()
+    most_sold = db.execute(most_sold_query, {"user_id": user_id}).fetchone()
+
+    most_profitable_query = text(
+        """
+        SELECT s.name
+        FROM services s
+        JOIN contracts c ON c.service_id = s.id
+        WHERE s.user_id = :user_id
+        GROUP BY s.id
+        ORDER BY SUM(c.value) - SUM(s.cost) DESC
+        LIMIT 1
+        """
     )
+    most_profitable = db.execute(most_profitable_query, {"user_id": user_id}).fetchone()
+
+    most_sold_monthly_query = text(
+        """
+        SELECT 
+            s.name,
+            COUNT(c.id) AS monthly_count,
+            to_char(c.created_at, 'YYYY-MM') AS month
+        FROM services s
+        JOIN contracts c ON c.service_id = s.id
+        WHERE s.user_id = :user_id
+        GROUP BY s.id, month
+        ORDER BY month
+        """
+    )
+    most_sold_monthly = db.execute(
+        most_sold_monthly_query, {"user_id": user_id}
+    ).fetchall()
 
     return {
-        "total_services": total_services,
-        "with_contracts": services_with_contracts,
-        "without_contracts": services_without_contracts,
+        "total_services": results.total_services if results else 0,
+        "with_contracts": results.services_with_contracts if results else 0,
+        "without_contracts": results.services_without_contracts if results else 0,
         "most_sold": most_sold.name if most_sold else None,
         "most_profitable": most_profitable.name if most_profitable else None,
-        "most_sold_monthly": [
-            {
-                "service_name": row.Service.name,
-                "monthly_count": row.monthly_count,
-                "month": row.month,
-            }
-            for row in most_sold_monthly
-        ],
+        "most_sold_monthly": (
+            [
+                {
+                    "service_name": row.name,
+                    "monthly_count": row.monthly_count,
+                    "month": row.month,
+                }
+                for row in most_sold_monthly
+            ]
+            if most_sold_monthly
+            else []
+        ),
     }
 
 
 def top_services(user_id: int, db: Session, limit: int = 5):
-    rows = (
-        db.query(
-            Service.id,
-            Service.name,
-            Service.cost,
-            func.count(Contract.id).label("contracts_count"),
-            func.sum(Contract.value).label("revenue"),
-        )
-        .filter(Service.user_id == user_id)
-        .join(Contract, Contract.service_id == Service.id)
-        .group_by(Service.id, Service.name, Service.cost)
-        .order_by(func.count(Contract.id).desc())
-        .limit(limit)
-        .all()
+    query = text(
+        """
+        SELECT
+            s.id,
+            s.name,
+            s.cost,
+            s.price,
+            COUNT(c.id) AS contracts_count,
+            SUM(c.value) AS revenue
+        FROM services s
+        JOIN contracts c ON c.service_id = s.id
+        WHERE s.user_id = :user_id
+        GROUP BY s.id, s.name, s.cost, s.price
+        ORDER BY contracts_count DESC
+        LIMIT :limit
+        """
     )
 
-    total_contracts = sum(row.contracts_count for row in rows)
+    rows = db.execute(query, {"user_id": user_id, "limit": limit}).fetchall()
+
+    total_contracts_query = text(
+        """
+        SELECT
+            COUNT(c.id) AS total_contracts
+        FROM contracts c
+        WHERE c.user_id = :user_id
+        """
+    )
+    total_contracts_result = db.execute(
+        total_contracts_query, {"user_id": user_id}
+    ).fetchone()
+    total_contracts = (
+        total_contracts_result.total_contracts if total_contracts_result else 0
+    )
 
     return [
         {
             "id": row.id,
             "name": row.name,
+            "price": round(row.price, 2),
             "revenue": round(row.revenue, 2) if row.revenue else 0,
             "cost": round(row.cost * row.contracts_count, 2),
             "profit": (
@@ -336,10 +455,13 @@ def top_services(user_id: int, db: Session, limit: int = 5):
                 else 0
             ),
             "contracts_count": row.contracts_count,
-            "popularity_percentage": (
-                round((row.contracts_count / total_contracts * 100), 2)
-                if total_contracts > 0
-                else 0
+            "popularity_percentage": round(
+                (
+                    (row.contracts_count / total_contracts * 100)
+                    if total_contracts > 0
+                    else 0
+                ),
+                2,
             ),
         }
         for row in rows

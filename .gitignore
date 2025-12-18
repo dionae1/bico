@@ -3,3 +3,4 @@
 /caddy_config/
 .local
 .*
+.idea/
