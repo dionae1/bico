@@ -22,6 +22,11 @@ jobs:
           pip install pytest httpx
           
       - name: Run Tests
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+          SECRET_KEY: test_secret_key
         run: |
           cd backend
           pytest
