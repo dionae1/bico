@@ -2,5 +2,4 @@
 /caddy_data/
 /caddy_config/
 .local
-.*
 .idea/
