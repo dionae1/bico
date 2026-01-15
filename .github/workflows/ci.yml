@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: [ "main", "feature", "fix" ]
   pull_request:
     branches: [ "main", "feature", "fix" ]
 
@@ -36,7 +34,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24.7.2'
+          node-version: '24.8'
           
       - name: Install & Build Check
         run: |
