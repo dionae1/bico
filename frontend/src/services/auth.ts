@@ -3,6 +3,21 @@ import api from '../api/client';
 export const login = async (email: string, password: string) => {
     try {
         const { data } = await api.post('/auth/login', { email, password }, { withCredentials: true });
+
+        if (data.access_token) {
+            localStorage.setItem('token', data.access_token);
+        }
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const refreshToken = async () => {
+    try {
+        const response = await api.post('/auth/refresh', {}, { withCredentials: true });
+        const { data } = response;
+
         if (data.access_token) {
             localStorage.setItem('token', data.access_token);
         }
