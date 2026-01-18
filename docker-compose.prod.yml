@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/bico-backend:latest
+    image: ghcr.io/dionae1/bico-backend:latest
     container_name: backend
     restart: always
     env_file: .env
@@ -11,7 +11,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/bico-frontend:latest
+    image: ghcr.io/dionae1/bico-frontend:latest
     container_name: frontend
     restart: always
     ports:
