@@ -33,8 +33,8 @@ def login(response: Response, user_in: LoginUserRequest, db: Session = Depends(g
         value=refresh_token,
         httponly=True,
         secure=False,
-        samesite="Lax",
-        max_age=24 * 60 * 60,
+        samesite='lax',
+        max_age=24 * 60 * 60 * 7,
         path="/",
     )
     
@@ -48,7 +48,7 @@ def logout(response: Response):
         path="/",
         httponly=True,
         secure=False,
-        samesite="Lax",
+        samesite='lax',
     )
     return {"detail": "Successfully logged out"}
 
@@ -111,8 +111,8 @@ def refresh_token(request: Request, response: Response, db: Session = Depends(ge
         value=refresh_token,
         httponly=True,
         secure=False,
-        samesite="Lax",
-        max_age=24 * 60 * 60,
+        samesite='lax',
+        max_age=24 * 60 * 60 * 7,
         path="/",
     )
     

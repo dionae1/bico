@@ -1,6 +1,7 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.core.utils import get_number_or_default
 
 def revenue_data(user_id: int, db: Session):
     query = text(
@@ -119,31 +120,22 @@ def clients_data(user_id: int, db: Session):
         most_valuable_query, {"user_id": user_id}
     ).fetchone()
 
+    new_clients = get_number_or_default(clients_results.monthly_new_clients) if clients_results else 0
+    total_clients = get_number_or_default(clients_results.total_clients) if clients_results else 0
+
     new_clients_percentage: float = (
-        (
-            (
-                clients_results.monthly_new_clients
-                / (clients_results.total_clients - clients_results.monthly_new_clients)
-                * 100
-            )
-            if (clients_results.total_clients - clients_results.monthly_new_clients) > 0
-            else 100
-        )
-        if clients_results
-        else 0
+        ((new_clients / (total_clients - new_clients) * 100) if (total_clients - new_clients) > 0 else 100)
+        if clients_results else 0
     )
 
+    with_contracts = get_number_or_default(clients_results.clients_with_contracts) if clients_results else 0
+    without_contracts = get_number_or_default(clients_results.clients_without_contracts) if clients_results else 0
+
     return {
-        "total_clients": clients_results.total_clients if clients_results else 0,
-        "clients_with_contracts": (
-            clients_results.clients_with_contracts if clients_results else 0
-        ),
-        "clients_without_contracts": (
-            clients_results.clients_without_contracts if clients_results else 0
-        ),
-        "monthly_new_clients": (
-            clients_results.monthly_new_clients if clients_results else 0
-        ),
+        "total_clients": total_clients,
+        "clients_with_contracts": with_contracts,
+        "clients_without_contracts": without_contracts,
+        "monthly_new_clients": new_clients,
         "new_clients_percentage": round(new_clients_percentage, 2),
         "most_contracts": most_contracts_result.name if most_contracts_result else None,
         "most_valuable": most_valuable_result.name if most_valuable_result else None,
@@ -227,19 +219,14 @@ def contracts_data(user_id: int, db: Session, limit: int = 3):
     )
     results = db.execute(query, {"user_id": user_id}).fetchone()
 
+    total_contracts = get_number_or_default(results.total_contracts) if results else 0
+    new_contracts = get_number_or_default(results.monthly_new_contracts) if results else 0
+
     new_contracts_percentage: float = (
-        (
-            (
-                results.monthly_new_contracts
-                / (results.total_contracts - results.monthly_new_contracts)
-                * 100
-            )
-            if (results.total_contracts - results.monthly_new_contracts) > 0
-            else 100
-        )
-        if results
-        else 0
-    )
+        ((new_contracts / (total_contracts - new_contracts) * 100) if (total_contracts - new_contracts) > 0 else 100)
+        if results else 0
+    ) if total_contracts > 0 else 0
+
     most_profitable_query = text(
         """
         SELECT c.id, s.name, (c.value - s.cost) AS profit
@@ -286,15 +273,21 @@ def contracts_data(user_id: int, db: Session, limit: int = 3):
         else []
     )
 
+    active_contracts = get_number_or_default(results.active_contracts) if results else 0
+    inactive_contracts = get_number_or_default(results.inactive_contracts) if results else 0
+    monthly_new_contracts = get_number_or_default(results.monthly_new_contracts) if results else 0
+    end_this_month_contracts = get_number_or_default(results.end_this_month_contracts) if results else 0
+    finished_contracts = get_number_or_default(results.finished_contracts) if results else 0
+
     return {
-        "total_contracts": results.total_contracts if results else 0,
-        "active_contracts": results.active_contracts if results else 0,
-        "inactive_contracts": results.inactive_contracts if results else 0,
-        "monthly_new_contracts": results.monthly_new_contracts if results else 0,
+        "total_contracts": total_contracts,
+        "active_contracts": active_contracts,
+        "inactive_contracts": inactive_contracts,
+        "monthly_new_contracts": monthly_new_contracts,
         "new_contracts_percentage": round(new_contracts_percentage, 2),
         "most_profitable": most_profitable.name if most_profitable else None,
-        "end_this_month_contracts": results.end_this_month_contracts if results else 0,
-        "finished_contracts": results.finished_contracts if results else 0,
+        "end_this_month_contracts": end_this_month_contracts,
+        "finished_contracts": finished_contracts,
         "expiring_contracts": expiring_contracts,
     }
 
