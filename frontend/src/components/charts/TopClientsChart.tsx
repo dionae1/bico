@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
+import Loading from '../Loading';
 import api from '../../api/client';
 
 interface TopClientData {
@@ -35,7 +36,11 @@ const TopClientsChart = () => {
         fetchData();
     }, []);
 
-    if (loading) return <div className="h-48 flex items-center justify-center text-slate-400">Loading chart...</div>;
+    if (loading) return (
+        <div className="bg-white p-4 md:p-6 rounded-sm shadow-sm border border-slate-200">
+            <Loading size="small" message="Loading chart..." />
+        </div>
+    );
     if (!data || data.length === 0) return null;
 
     return (

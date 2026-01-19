@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
+import Loading from '../Loading';
 import api from '../../api/client';
 
 interface RevenueData {
@@ -28,7 +29,11 @@ const RevenueChart = () => {
         fetchData();
     }, []);
 
-    if (loading) return <div className="h-64 flex items-center justify-center text-slate-400">Loading chart...</div>;
+    if (loading) return (
+        <div className="bg-white p-6 rounded-sm shadow-sm border border-slate-200">
+            <Loading size="small" message="Loading chart..." />
+        </div>
+    );
     if (!data || data.length === 0) return null;
 
     return (

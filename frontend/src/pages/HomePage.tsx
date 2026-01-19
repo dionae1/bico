@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { capitalize } from "../services/util";
 
 import Dashboard from "../components/dashboard/Dashboard";
+import Loading from "../components/Loading";
 import api from "../api/client";
 
 interface User {
@@ -24,7 +25,7 @@ function HomePage() {
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <Loading fullScreen message="Loading your dashboard..." />;
     }
 
     return (

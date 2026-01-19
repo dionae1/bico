@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { FaDeleteLeft } from "react-icons/fa6";
 
+import Loading from "../../components/Loading";
 import DashboardBase from "../../components/cards/dashboard/DashboardBase";
 import ContractModal from "../../components/modals/ContractModal";
 import NoItems from "../../components/NoItems";
@@ -16,6 +17,7 @@ import { Contract, ContractData } from "@/types/Contract";
 
 function MainContract() {
     const [contracts, setContracts] = useState<Contract[]>([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [contractModal, setContractModal] = useState(false);
     const [highlightItem, setHighlightItem] = useState<Contract | null>(null);
@@ -34,6 +36,7 @@ function MainContract() {
 
     const fetchContracts = async () => {
         try {
+            setLoading(true);
             const response = await api.get("/contracts/user");
             const contractsData = await api.get("/dashboard/contracts");
             setContracts(response.data);
@@ -42,6 +45,8 @@ function MainContract() {
             if (error.response?.data?.detail !== "No contracts found") {
                 console.error("Error fetching contracts");
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -124,6 +129,9 @@ function MainContract() {
         fetchContracts();
     }, []);
 
+    if (loading) {
+        return <Loading fullScreen message="Loading contracts..." />;
+    }
 
     return (
         <div className="max-w-6xl mx-auto p-6">

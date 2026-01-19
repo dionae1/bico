@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+import Loading from "../Loading";
 import RevenueOverview from "../cards/dashboard/RevenueOverview";
 import ClientsOverview from "../cards/dashboard/ClientsOverview";
 import ContractOverview from "../cards/dashboard/ContractOverview";
@@ -29,7 +30,7 @@ function Dashboard() {
     }, []);
 
     if (!data || loading) {
-        return <div>Loading...</div>;
+        return <Loading message="Loading dashboard data..." />;
     }
 
     return (

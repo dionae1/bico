@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import Loading from "../../components/Loading";
 import BackButton from "../../components/buttons/BackButton";
 import FormButton from "../../components/buttons/FormButton";
 
@@ -62,7 +63,7 @@ function ViewContract() {
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <Loading fullScreen message="Loading contract data..." />;
 
     return (
         <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-sm border border-slate-200 mt-10 p-10">

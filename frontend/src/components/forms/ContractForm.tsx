@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+import Loading from "../Loading";
 import FormInput from "../FormInput";
 import FormButton from "../buttons/FormButton";
 import BackButton from "../buttons/BackButton";
@@ -18,31 +19,27 @@ function ContractForm({ onCreated }: { onCreated?: () => void }) {
 
     const [services, setServices] = useState<Service[]>([]);
     const [clients, setClients] = useState<Client[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const isValid = (clientId !== "" && serviceId !== "" && created_at !== "" && end_at !== "" && value !== "");
 
     useEffect(() => {
-        try {
-            const fetchServices = async () => {
-                const response = await api.get("/services/");
-                setServices(response.data);
-            };
-            fetchServices();
-        } catch (error) {
-            console.error("Error fetching services");
-        }
-    }, []);
-
-    useEffect(() => {
-        try {
-            const fetchClients = async () => {
-                const response = await api.get("/clients/");
-                setClients(response.data);
-            };
-            fetchClients();
-        } catch (error) {
-            console.error("Error fetching clients");
-        }
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const [servicesResponse, clientsResponse] = await Promise.all([
+                    api.get("/services/"),
+                    api.get("/clients/")
+                ]);
+                setServices(servicesResponse.data);
+                setClients(clientsResponse.data);
+            } catch (error) {
+                console.error("Error fetching data");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
     }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -76,6 +73,10 @@ function ContractForm({ onCreated }: { onCreated?: () => void }) {
         setCreatedAt("");
         setEndAt("");
         setValue("");
+    }
+
+    if (loading) {
+        return <Loading message="Loading form data..." />;
     }
 
     return (

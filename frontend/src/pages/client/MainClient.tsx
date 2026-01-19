@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { FaDeleteLeft } from "react-icons/fa6";
 
+import Loading from "../../components/Loading";
 import DashboardBase from "../../components/cards/dashboard/DashboardBase";
 import ClientModal from "../../components/modals/ClientModal";
 import NoItems from "../../components/NoItems";
@@ -18,6 +19,7 @@ import { Client, ClientsData } from "@/types/Client";
 
 function MainClient() {
     const [clients, setClients] = useState<Client[]>([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [clientModal, setClientModal] = useState(false);
     const [highlightItem, setHighlightItem] = useState<Client | null>(null);
@@ -36,12 +38,15 @@ function MainClient() {
 
     const fetchClients = async () => {
         try {
+            setLoading(true);
             const response = await api.get("/clients");
             const clientsData = await api.get("/dashboard/clients");
             setClients(response.data);
             setClientsData(clientsData.data);
         } catch (error) {
             console.error("Error fetching clients");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -120,6 +125,10 @@ function MainClient() {
     useEffect(() => {
         fetchClients();
     }, []);
+
+    if (loading) {
+        return <Loading fullScreen message="Loading clients..." />;
+    }
 
     return (
         <div className="max-w-6xl mx-auto p-6">

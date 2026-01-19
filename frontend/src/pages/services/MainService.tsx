@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { FaEdit } from "react-icons/fa";
 import { FaDeleteLeft } from "react-icons/fa6";
 
+import Loading from "../../components/Loading";
 import DashboardBase from "../../components/cards/dashboard/DashboardBase"
 import ServiceModal from "../../components/modals/ServiceModal"
 import NoItems from "../../components/NoItems"
@@ -16,6 +17,7 @@ import { Service, ServiceData } from "@/types/Service"
 
 function MainService() {
     const [services, setServices] = useState<Service[]>([])
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("")
     const [serviceModal, setServiceModal] = useState(false);
     const [highlightItem, setHighlightItem] = useState<Service | null>(null);
@@ -34,12 +36,15 @@ function MainService() {
 
     const fetchServices = async () => {
         try {
+            setLoading(true);
             const response = await api.get("/services")
             const servicesData = await api.get("/dashboard/services");
             setServices(response.data);
             setServicesData(servicesData.data);
         } catch (error) {
             console.error("Error fetching services");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -117,6 +122,10 @@ function MainService() {
     useEffect(() => {
         fetchServices()
     }, [])
+
+    if (loading) {
+        return <Loading fullScreen message="Loading services..." />;
+    }
 
     return (
         <div className="max-w-6xl mx-auto p-6">
