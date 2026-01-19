@@ -38,7 +38,6 @@ function MainClient() {
 
     const fetchClients = async () => {
         try {
-            setLoading(true);
             const response = await api.get("/clients");
             const clientsData = await api.get("/dashboard/clients");
             setClients(response.data);
@@ -59,6 +58,9 @@ function MainClient() {
         if (clientToDelete) {
             api.delete(`/clients/${clientToDelete.id}`)
                 .then(() => {
+                    // Atualizar estado local imediatamente
+                    setClients(clients.filter(c => c.id !== clientToDelete.id));
+                    // Buscar dados atualizados do servidor
                     fetchClients();
                     setConfirmModal(false);
                     setClientToDelete(null);
@@ -138,17 +140,11 @@ function MainClient() {
 
             <div className="mb-8">
                 {clientsData && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <DashboardBase data={clientsData.total_clients} title="Total Clients" />
-                        <DashboardBase data={clientsData.clients_with_contracts} title="Clients with Contracts" />
                         <DashboardBase data={clientsData.monthly_new_clients} title="Monthly New Clients" percentage={clientsData.new_clients_percentage} />
-                        <DashboardBase data={clientsData.clients_without_contracts} title="Inactive Clients" />
-                        {
-                            clientsData.most_contracts && <DashboardBase data={clientsData.most_contracts} title="Most Contracts" />
-                        }
-                        {
-                            clientsData.most_valuable && <DashboardBase data={clientsData.most_valuable} title="Most Valuable" />
-                        }
+                        <DashboardBase data={clientsData.most_contracts || "—"} title="Most Contracts" />
+                        <DashboardBase data={clientsData.most_valuable || "—"} title="Most Valuable" />
                     </div>
                 )}
             </div>

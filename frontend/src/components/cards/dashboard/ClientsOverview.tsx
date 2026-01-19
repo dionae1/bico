@@ -1,12 +1,13 @@
 import MultipleItemsDashboardBase from "./MultipleItemsDashboardBase";
 
 interface ClientsOverviewProps {
-    total_clients: number;
-    active_clients: number;
-    inactive_clients: number;
-    clients_with_contracts: number;
-    monthly_new_clients: number;
-    new_clients_percentage: number;
+    total_clients: number,
+    clients_with_contracts: number,
+    clients_without_contracts: number,
+    monthly_new_clients: number,
+    new_clients_percentage: number,
+    most_contracts: any,
+    most_valuable: any
 }
 
 function ClientsOverview({ data, title = "Clients" }: { data: ClientsOverviewProps; title?: string }) {

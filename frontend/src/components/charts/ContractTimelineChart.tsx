@@ -33,7 +33,16 @@ const ContractTimelineChart = () => {
             <Loading size="small" message="Loading chart..." />
         </div>
     );
-    if (!data || data.length === 0) return null;
+    
+    if (!data || data.length === 0) return (
+        <div className="bg-white p-6 rounded-sm shadow-sm border border-slate-200">
+            <h3 className="text-xl font-semibold text-slate-800 mb-4">Contract Timeline</h3>
+            <div className="h-32 w-full flex flex-col items-center justify-center text-slate-400">
+                <p className="text-lg font-medium">No contract timeline data yet</p>
+                <p className="text-sm mt-2">Add contracts to see creation timeline</p>
+            </div>
+        </div>
+    );
 
     return (
         <div className="bg-white p-6 rounded-sm shadow-sm border border-slate-200">

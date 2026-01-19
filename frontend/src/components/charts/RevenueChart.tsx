@@ -34,7 +34,16 @@ const RevenueChart = () => {
             <Loading size="small" message="Loading chart..." />
         </div>
     );
-    if (!data || data.length === 0) return null;
+    
+    if (!data || data.length === 0) return (
+        <div className="bg-white p-6 rounded-sm shadow-sm border border-slate-200">
+            <h3 className="text-xl font-semibold text-slate-800 mb-4">Revenue History</h3>
+            <div className="h-64 w-full flex flex-col items-center justify-center text-slate-400">
+                <p className="text-lg font-medium">No revenue history yet</p>
+                <p className="text-sm mt-2">Create contracts to track revenue over time</p>
+            </div>
+        </div>
+    );
 
     return (
         <div className="bg-white p-6 rounded-sm shadow-sm border border-slate-200">

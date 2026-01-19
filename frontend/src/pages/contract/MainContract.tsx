@@ -36,7 +36,6 @@ function MainContract() {
 
     const fetchContracts = async () => {
         try {
-            setLoading(true);
             const response = await api.get("/contracts/user");
             const contractsData = await api.get("/dashboard/contracts");
             setContracts(response.data);
@@ -59,6 +58,9 @@ function MainContract() {
         if (contractToDelete) {
             api.delete(`/contracts/${contractToDelete.id}`)
                 .then(() => {
+                    // Atualizar estado local imediatamente
+                    setContracts(contracts.filter(c => c.id !== contractToDelete.id));
+                    // Buscar dados atualizados do servidor
                     fetchContracts();
                     setConfirmModal(false);
                     setContractToDelete(null);
@@ -141,16 +143,13 @@ function MainContract() {
 
             <div className="mb-10">
                 {contractsData && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                         <DashboardBase data={contractsData.total_contracts} title="Total Contracts" />
                         <DashboardBase data={contractsData.active_contracts} title="Active Contracts" />
                         <DashboardBase data={contractsData.monthly_new_contracts} title="Monthly New Contracts" percentage={contractsData.new_contracts_percentage} />
                         <DashboardBase data={contractsData.end_this_month_contracts} title="Ending This Month" />
                         <DashboardBase data={contractsData.finished_contracts} title="Finished Contracts" />
-
-                        {
-                            contractsData.most_profitable && <DashboardBase data={contractsData.most_profitable} title="Most Profitable Contract" />
-                        }
+                        <DashboardBase data={contractsData.most_profitable || "—"} title="Most Profitable" />
                     </div>
                 )}
             </div>

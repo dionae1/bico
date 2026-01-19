@@ -36,7 +36,6 @@ function MainService() {
 
     const fetchServices = async () => {
         try {
-            setLoading(true);
             const response = await api.get("/services")
             const servicesData = await api.get("/dashboard/services");
             setServices(response.data);
@@ -57,6 +56,9 @@ function MainService() {
         if (serviceToDelete) {
             api.delete(`/services/${serviceToDelete.id}`)
                 .then(() => {
+                    // Atualizar estado local imediatamente
+                    setServices(services.filter(s => s.id !== serviceToDelete.id));
+                    // Buscar dados atualizados do servidor
                     fetchServices();
                     setConfirmModal(false);
                     setServiceToDelete(null);
@@ -135,11 +137,11 @@ function MainService() {
 
             <div className="mb-8">
                 {servicesData && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <DashboardBase data={servicesData.total_services} title="Total" />
-                        <DashboardBase data={servicesData.with_contracts} title="Active" />
-                        <DashboardBase data={servicesData.most_sold} title="Most Popular" />
-                        <DashboardBase data={servicesData.most_profitable} title="Most Profitable" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <DashboardBase data={servicesData.total_services} title="Total Services" />
+                        <DashboardBase data={servicesData.with_contracts} title="Active Services" />
+                        <DashboardBase data={servicesData.most_sold || "—"} title="Most Popular" />
+                        <DashboardBase data={servicesData.most_profitable || "—"} title="Most Profitable" />
                     </div>
                 )}
             </div>

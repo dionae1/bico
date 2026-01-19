@@ -1,24 +1,31 @@
 import { useState, useEffect } from "react";
 import { capitalize } from "../services/util";
 
+import { DashboardData } from "@/types/Dashboard";
+import { User } from "@/types/User";
+
+
 import Dashboard from "../components/dashboard/Dashboard";
 import Loading from "../components/Loading";
 import api from "../api/client";
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-}
+import EmptyDashboard from "../components/dashboard/EmptyDashboard";
 
 function HomePage() {
     const [user, setUser] = useState<User | null>(null);
+    const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+    const [topServices, setTopServices] = useState([]);
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await api.get("/users/me");
-            setUser(response.data);
+            const responseUser = await api.get("/users/me");
+            const responseDashboard = await api.get("/dashboard");
+            const responseTopServices = await api.get("/dashboard/top-services/?limit=3");
+
+            setUser(responseUser.data);
+            setDashboardData(responseDashboard.data);
+            setTopServices(responseTopServices.data);
             setLoading(false);
         };
         fetchData();
@@ -26,6 +33,15 @@ function HomePage() {
 
     if (loading) {
         return <Loading fullScreen message="Loading your dashboard..." />;
+    }
+    const hasClients = dashboardData && dashboardData.clients.total_clients > 0;
+    const hasContracts = dashboardData && dashboardData.contracts.total_contracts > 0;
+    const hasServices = topServices.length > 0;
+
+    const isEmpty = !(hasClients || hasContracts || hasServices);
+
+    if (isEmpty) {
+        return <EmptyDashboard />;
     }
 
     return (
@@ -42,7 +58,7 @@ function HomePage() {
                     Detailed statistics on their respective pages.
                 </h4>
             </div>
-            <Dashboard />
+            {dashboardData && <Dashboard data={dashboardData} topServices={topServices} />}
         </div>
     );
 }
