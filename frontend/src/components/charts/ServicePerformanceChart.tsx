@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
+import Loading from '../Loading';
 import api from '../../api/client';
 
 interface ServiceData {
@@ -27,8 +28,21 @@ const ServicePerformanceChart = () => {
         fetchData();
     }, []);
 
-    if (loading) return <div className="h-64 flex items-center justify-center text-slate-400">Loading chart...</div>;
-    if (!data || data.length === 0) return null;
+    if (loading) return (
+        <div className="bg-white p-4 md:p-6 rounded-sm shadow-sm border border-slate-200">
+            <Loading size="small" message="Loading chart..." />
+        </div>
+    );
+    
+    if (!data || data.length === 0) return (
+        <div className="bg-white p-4 md:p-6 rounded-sm shadow-sm border border-slate-200 flex flex-col items-center">
+            <h3 className="text-xl font-semibold text-slate-800 mb-2 text-center w-full">Top Services Performance</h3>
+            <div className="w-full h-32 flex flex-col items-center justify-center text-slate-400">
+                <p className="text-lg font-medium">No service data available yet</p>
+                <p className="text-sm mt-2">Add services to track performance</p>
+            </div>
+        </div>
+    );
 
     return (
         <div className="bg-white p-4 md:p-6 rounded-sm shadow-sm border border-slate-200 flex flex-col items-center">

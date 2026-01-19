@@ -16,7 +16,6 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 import api from "../api/client";
-import { refreshToken } from "../services/auth";
     
 function WelcomePage() {
     const [scrolled, setScrolled] = useState(false);
@@ -25,18 +24,6 @@ function WelcomePage() {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                await refreshToken();
-                window.location.href = '/home';
-            } catch {
-                localStorage.removeItem('token');
-            }
-        };
-        checkAuth();
     }, []);
 
     const handleDemoClick = async () => {

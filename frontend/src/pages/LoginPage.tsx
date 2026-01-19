@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/auth";
+import { login, refreshToken } from "../services/auth";
 import { isValidEmail, isValidPassword } from "../services/util";
 
 import FormButton from "../components/buttons/FormButton";
@@ -14,6 +14,18 @@ function LoginPage() {
 
     const [invalidEmail, setInvalidEmail] = useState(true);
     const [invalidPassword, setInvalidPassword] = useState(true);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                await refreshToken();
+                navigate('/home');
+            } catch {
+                localStorage.removeItem('token');
+            }
+        };
+        checkAuth();
+    }, [navigate]);
 
     const validateForm = () => {
         setInvalidEmail(!isValidEmail(email));

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { FaDeleteLeft } from "react-icons/fa6";
 
+import Loading from "../../components/Loading";
 import DashboardBase from "../../components/cards/dashboard/DashboardBase";
 import ClientModal from "../../components/modals/ClientModal";
 import NoItems from "../../components/NoItems";
@@ -18,6 +19,7 @@ import { Client, ClientsData } from "@/types/Client";
 
 function MainClient() {
     const [clients, setClients] = useState<Client[]>([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [clientModal, setClientModal] = useState(false);
     const [highlightItem, setHighlightItem] = useState<Client | null>(null);
@@ -42,6 +44,8 @@ function MainClient() {
             setClientsData(clientsData.data);
         } catch (error) {
             console.error("Error fetching clients");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -54,6 +58,9 @@ function MainClient() {
         if (clientToDelete) {
             api.delete(`/clients/${clientToDelete.id}`)
                 .then(() => {
+                    // Atualizar estado local imediatamente
+                    setClients(clients.filter(c => c.id !== clientToDelete.id));
+                    // Buscar dados atualizados do servidor
                     fetchClients();
                     setConfirmModal(false);
                     setClientToDelete(null);
@@ -121,6 +128,10 @@ function MainClient() {
         fetchClients();
     }, []);
 
+    if (loading) {
+        return <Loading fullScreen message="Loading clients..." />;
+    }
+
     return (
         <div className="max-w-6xl mx-auto p-6">
             {error && <ErrorModal message={error} onClose={() => setError(null)} />}
@@ -129,17 +140,11 @@ function MainClient() {
 
             <div className="mb-8">
                 {clientsData && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <DashboardBase data={clientsData.total_clients} title="Total Clients" />
-                        <DashboardBase data={clientsData.clients_with_contracts} title="Clients with Contracts" />
                         <DashboardBase data={clientsData.monthly_new_clients} title="Monthly New Clients" percentage={clientsData.new_clients_percentage} />
-                        <DashboardBase data={clientsData.clients_without_contracts} title="Inactive Clients" />
-                        {
-                            clientsData.most_contracts && <DashboardBase data={clientsData.most_contracts} title="Most Contracts" />
-                        }
-                        {
-                            clientsData.most_valuable && <DashboardBase data={clientsData.most_valuable} title="Most Valuable" />
-                        }
+                        <DashboardBase data={clientsData.most_contracts || "—"} title="Most Contracts" />
+                        <DashboardBase data={clientsData.most_valuable || "—"} title="Most Valuable" />
                     </div>
                 )}
             </div>

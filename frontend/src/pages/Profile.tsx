@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { capitalize } from "../services/util";
 
+import Loading from "../components/Loading";
 import FormInput from "../components/FormInput";
 import FormButton from "../components/buttons/FormButton";
 
@@ -79,7 +80,7 @@ function Profile() {
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <Loading fullScreen message="Loading profile..." />;
     }
 
     return (
