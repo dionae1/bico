@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const api = axios.create({
     baseURL: '/api/v1',
-    // baseURL: 'http://localhost:8000/api/v1',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -30,13 +29,16 @@ api.interceptors.response.use(
     },
     async (error) => {
         const request = error.config;
+
         if (error.response?.status !== 401) {
             return Promise.reject(error);
         }
 
         if (request._retry) {
             localStorage.removeItem('token');
-            window.location.href = '/login';
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
             return Promise.reject(error);
         }
         request._retry = true;
@@ -73,7 +75,9 @@ api.interceptors.response.use(
             failedQueue = [];
 
             localStorage.removeItem('token');
-            window.location.href = '/login';
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
             return Promise.reject(err);
         }
     }

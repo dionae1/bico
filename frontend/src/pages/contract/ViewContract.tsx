@@ -9,6 +9,7 @@ import api from "../../api/client";
 import FormInput from "../../components/FormInput";
 
 import { Contract } from "@/types/Contract";
+import { AxiosError } from "axios";
 
 function ViewContract() {
     const { id } = useParams<{ id: string }>();
@@ -33,7 +34,9 @@ function ViewContract() {
                 setEndAt(data.end_at ? data.end_at.split('T')[0] : "");
                 setContract(data);
             } catch (error) {
-                console.error("Error fetching contracts");
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Error fetching contracts");
+            
             } finally {
                 setLoading(false);
             }

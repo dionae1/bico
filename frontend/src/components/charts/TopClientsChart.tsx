@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import Loading from '../Loading';
 import api from '../../api/client';
+import { AxiosError } from 'axios';
 
 interface TopClientData {
     id: number;
@@ -21,14 +22,15 @@ const TopClientsChart = () => {
         const fetchData = async () => {
             try {
                 const response = await api.get('/dashboard/top-clients/?limit=3');
-                // Truncate names if too long
                 const processedData = response.data.map((client: TopClientData) => ({
                     ...client,
                     name: client.name.length > 15 ? client.name.slice(0, 15) + '...' : client.name
                 }));
                 setData(processedData);
             } catch (error) {
-                console.error("Error fetching top clients");
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Error fetching top clients");
+
             } finally {
                 setLoading(false);
             }

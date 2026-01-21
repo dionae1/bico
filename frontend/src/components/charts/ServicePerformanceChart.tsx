@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import Loading from '../Loading';
 import api from '../../api/client';
+import { AxiosError } from 'axios';
 
 interface ServiceData {
     name: string;
@@ -20,7 +21,9 @@ const ServicePerformanceChart = () => {
                 const response = await api.get('/dashboard/top-services/?limit=5');
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching service data");
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Error fetching service data");
+
             } finally {
                 setLoading(false);
             }

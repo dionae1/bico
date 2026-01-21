@@ -9,6 +9,7 @@ import { Service } from "@/types/Service";
 import { Client } from "@/types/Client";
 
 import api from "../../api/client";
+import { AxiosError } from "axios";
 
 function ContractForm({ onCreated }: { onCreated?: () => void }) {
     const [clientId, setClientId] = useState("");
@@ -34,7 +35,9 @@ function ContractForm({ onCreated }: { onCreated?: () => void }) {
                 setServices(servicesResponse.data);
                 setClients(clientsResponse.data);
             } catch (error) {
-                console.error("Error fetching data");
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Error fetching data");
+                
             } finally {
                 setLoading(false);
             }

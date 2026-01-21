@@ -7,6 +7,7 @@ import FormButton from "../../components/buttons/FormButton";
 import FormInput from "../../components/FormInput";
 
 import api from "../../api/client";
+import { AxiosError } from "axios";
 
 function ViewClient() {
     const { id } = useParams();
@@ -32,7 +33,9 @@ function ViewClient() {
                 setClientPhone(data.phone || "");
                 setClientAddress(data.address || "");
             } catch (error) {
-                console.error("Error fetching client");
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Error fetching client");
+                
             } finally {
                 setLoading(false);
             }

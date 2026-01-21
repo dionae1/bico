@@ -16,6 +16,7 @@ import ClientCard from "../../components/cards/ClientCard";
 import { formatPhoneNumber } from "../../services/util";
 import api from "../../api/client";
 import { Client, ClientsData } from "@/types/Client";
+import { AxiosError } from "axios";
 
 function MainClient() {
     const [clients, setClients] = useState<Client[]>([]);
@@ -43,7 +44,9 @@ function MainClient() {
             setClients(response.data);
             setClientsData(clientsData.data);
         } catch (error) {
-            console.error("Error fetching clients");
+            if (error instanceof AxiosError && error.response?.status !== 404)
+                console.error("Error fetching clients");
+            
         } finally {
             setLoading(false);
         }

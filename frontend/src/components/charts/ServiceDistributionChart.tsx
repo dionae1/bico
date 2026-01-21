@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
 import Loading from '../Loading';
 import api from '../../api/client';
+import { AxiosError } from 'axios';
 
 interface ServiceData {
     name: string;
@@ -22,7 +23,9 @@ const ServiceDistributionChart = () => {
                 const response = await api.get('/dashboard/top-services/?limit=5');
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching service distribution");
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Error fetching service distribution");
+
             } finally {
                 setLoading(false);
             }
