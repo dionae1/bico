@@ -1,13 +1,15 @@
 # <center>BiCO - Freelancer Management System</center>
 
-### <center>[Available at bicoapp.me](https://bicoapp.me)</center>
+### [Available at bicoapp.me](https://bicoapp.me)
+### [Software Requirements Specification](https://docs.google.com/document/d/1iAtY6wLn97dUmmQTi_aexQPQCrwsd_uIaxCKWP_D_cY/edit?usp=sharing)
 
 ##
+
 Welcome to the **BiCO** repository. This is a Full Stack project designed to help freelancers manage their business by centralizing control over clients, services, contracts.
 
 The focus of this project lies in acquiring experience in modern web development, focused on backend, software architecture, and containerization.
 
-## 🚀 Technologies Used
+## Technologies Used
 
 The project was built separating client and server responsibilities to ensure scalability and maintainability.
 
@@ -35,7 +37,7 @@ The project was built separating client and server responsibilities to ensure sc
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 *   **Demo Mode:** Generates a temporary account with dummy data for immediate testing without registration.
 *   **Analytics Dashboard:** Overview of revenue, profit, top-selling services, and expiring contracts.
@@ -61,35 +63,5 @@ The repository is organized as a monorepo:
 │   │   └── types/      # TypeScript type definitions
 ├── caddy_config/       # Caddy server configuration
 ├── docker-compose.yml  # Container orchestration
-└── Makefile            # Automation commands
 ```
-
----
-
-## 🛠️ How to Run the Project
-
-The project includes a `Makefile` to simplify the development environment setup.
-
-### Prerequisites
-*   Docker & Docker Compose (Production/demo)
-*   Node.js & Python 3.12 (Local development)
-
-### Installation
-
-```bash
-git clone https://github.com/dionae1/bico.git bico-repo
-cd bico-repo
-```
-
-### Run Via Docker
-
-To start the entire environment:
-
-```bash
-cp example.env .env
-docker-compose up --build
-```
-
-Access at: `http://localhost`
-
 ---
