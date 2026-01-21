@@ -7,6 +7,7 @@ import FormButton from "../../components/buttons/FormButton";
 import FormInput from "../../components/FormInput";
 
 import api from "../../api/client";
+import { AxiosError } from "axios";
 
 function ViewService() {
     const { id } = useParams();
@@ -36,7 +37,9 @@ function ViewService() {
                 setServicePeriodicity(data.periodicity || "");
                 setLoading(false);
             } catch (error) {
-                console.error("Error fetching service");
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Error fetching service");
+                
                 setLoading(false);
             }
         };

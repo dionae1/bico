@@ -14,6 +14,7 @@ import ContractCard from "../../components/cards/ContractCard";
 
 import api from "../../api/client";
 import { Contract, ContractData } from "@/types/Contract";
+import { AxiosError } from "axios";
 
 function MainContract() {
     const [contracts, setContracts] = useState<Contract[]>([]);
@@ -40,10 +41,10 @@ function MainContract() {
             const contractsData = await api.get("/dashboard/contracts");
             setContracts(response.data);
             setContractsData(contractsData.data);
-        } catch (error: any) {
-            if (error.response?.data?.detail !== "No contracts found") {
+        } catch (error) {
+            if (error instanceof AxiosError && error.response?.status !== 404)
                 console.error("Error fetching contracts");
-            }
+            
         } finally {
             setLoading(false);
         }

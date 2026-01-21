@@ -14,6 +14,7 @@ import ServiceCard from "../../components/cards/ServiceCard";
 
 import api from "../../api/client"
 import { Service, ServiceData } from "@/types/Service"
+import { AxiosError } from "axios";
 
 function MainService() {
     const [services, setServices] = useState<Service[]>([])
@@ -41,7 +42,9 @@ function MainService() {
             setServices(response.data);
             setServicesData(servicesData.data);
         } catch (error) {
-            console.error("Error fetching services");
+            if (error instanceof AxiosError && error.response?.status !== 404)    
+                console.error("Error fetching services");
+
         } finally {
             setLoading(false);
         }

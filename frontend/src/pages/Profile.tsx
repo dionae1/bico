@@ -7,6 +7,7 @@ import FormButton from "../components/buttons/FormButton";
 
 import api from "../api/client";
 import { FaUserCircle } from "react-icons/fa";
+import { AxiosError } from "axios";
 
 interface User {
     id: number;
@@ -28,8 +29,10 @@ function Profile() {
                 const response = await api.get("/users/me");
                 setUser(response.data);
                 setOriginalUser(response.data);
-            } catch (err) {
-                console.error("Failed to fetch profile");
+            } catch (error) {
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Failed to fetch profile");
+                
                 setError("Failed to load profile.");
             } finally {
                 setLoading(false);

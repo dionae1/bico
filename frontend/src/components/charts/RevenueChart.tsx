@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import Loading from '../Loading';
 import api from '../../api/client';
+import { AxiosError } from 'axios';
 
 interface RevenueData {
     month: string;
@@ -21,7 +22,9 @@ const RevenueChart = () => {
                 const response = await api.get('/dashboard/revenue-history/');
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching revenue history");
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Error fetching revenue history");
+                
             } finally {
                 setLoading(false);
             }

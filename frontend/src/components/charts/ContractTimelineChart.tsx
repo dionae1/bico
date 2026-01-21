@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import Loading from '../Loading';
 import api from '../../api/client';
+import { AxiosError } from 'axios';
 
 interface ContractData {
     month: string;
@@ -20,7 +21,9 @@ const ContractTimelineChart = () => {
                 const response = await api.get('/dashboard/contracts-history/');
                 setData(response.data);
             } catch (error) {
-                console.error("Error fetching contract history");
+                if (error instanceof AxiosError && error.response?.status !== 404)
+                    console.error("Error fetching contract history");
+                
             } finally {
                 setLoading(false);
             }
