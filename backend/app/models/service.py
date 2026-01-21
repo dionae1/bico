@@ -1,17 +1,16 @@
-from sqlalchemy import String, ForeignKey, Float
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from app.db.base import Base
 
+from sqlalchemy import String, ForeignKey, Float
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+import uuid
 
 class Service(Base):
     __tablename__ = "services"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, index=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
-    supplier_id: Mapped[int] = mapped_column(ForeignKey("suppliers.id"), nullable=True)
     name: Mapped[str] = mapped_column(String(100))
     cost: Mapped[float] = mapped_column(Float, nullable=True, default=0.0)
     price: Mapped[float] = mapped_column(Float)
@@ -21,7 +20,6 @@ class Service(Base):
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="services")
-    supplier: Mapped["Supplier"] = relationship("Supplier", back_populates="services")
     contracts: Mapped[list["Contract"]] = relationship(
         "Contract", back_populates="service"
     )

@@ -1,4 +1,4 @@
-from app.db.models import User, Service, Client, Supplier, Contract
+from app.db.models import User, Service, Client, Contract
 from app.core.auth import hash_password, verify_password
 from sqlalchemy.orm import Session
 import uuid
@@ -6,12 +6,14 @@ from datetime import datetime, timedelta, timezone
 from faker import Faker
 import random
 
+import uuid
+
 
 def get_user_by_email(email: str, db: Session) -> User | None:
     return db.query(User).filter(User.email == email).first()
 
 
-def get_user_by_id(user_id: int, db: Session) -> User | None:
+def get_user_by_id(user_id: uuid.UUID, db: Session) -> User | None:
     return db.query(User).filter(User.id == user_id).first()
 
 
@@ -86,7 +88,7 @@ def authenticate_user(email: str, password: str, db: Session) -> User | None:
     return None
 
 
-def delete_user(user_id: int, db: Session) -> bool:
+def delete_user(user_id: uuid.UUID, db: Session) -> bool:
     user = db.query(User).filter(User.id == user_id).first()
     if user:
         db.delete(user)
@@ -95,7 +97,7 @@ def delete_user(user_id: int, db: Session) -> bool:
     return False
 
 
-def update_user(user_id: int, db: Session, **kwargs) -> User | None:
+def update_user(user_id: uuid.UUID, db: Session, **kwargs) -> User | None:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return None

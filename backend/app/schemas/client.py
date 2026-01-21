@@ -1,10 +1,11 @@
-from pydantic import BaseModel
-
 from app.models.client import Client
+
+from pydantic import BaseModel
+import uuid
 
 
 class ResponseClient(BaseModel):
-    id: int
+    id: uuid.UUID
     name: str
     email: str | None = None
     phone: str | None = None

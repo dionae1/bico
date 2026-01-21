@@ -1,20 +1,21 @@
 from datetime import datetime
-
 from sqlalchemy.engine import Row
-from app.db.models import User, Service, Client, Supplier, Contract
+from app.db.models import Service, Client, Contract
 from sqlalchemy.orm import Session
+
+import uuid
 
 
 def create_contract(
-    user_id: int,
-    service_id: int,
-    client_id: int,
+    user_id: uuid.UUID,
+    service_id: uuid.UUID,
+    client_id: uuid.UUID,
     created_at: datetime,
     end_at: datetime,
     value: float,
     db: Session,
 ) -> Contract:
-
+    
     contract = Contract(
         user_id=user_id,
         service_id=service_id,
@@ -29,10 +30,7 @@ def create_contract(
     return contract
 
 
-def get_contract_by_id(
-    contract_id: int, user_id: int, db: Session
-) -> Row[tuple[Contract, Client, Service]] | None:
-
+def get_contract_by_id(contract_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> Row[tuple[Contract, Client, Service]] | None:
     contract = (
         db.query(Contract, Client, Service)
         .filter(Contract.id == contract_id, Contract.user_id == user_id)
@@ -43,8 +41,7 @@ def get_contract_by_id(
     return contract
 
 
-def get_contracts_by_client(client_id: int, user_id: int, db: Session) -> list[dict]:
-
+def get_contracts_by_client(client_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> list[dict]:
     contracts = (
         db.query(Contract, Client, Service)
         .filter(Contract.client_id == client_id, Contract.user_id == user_id)
@@ -62,8 +59,7 @@ def get_contracts_by_client(client_id: int, user_id: int, db: Session) -> list[d
     return clients_services
 
 
-def get_contracts_by_user(user_id: int, db: Session) -> list[dict]:
-
+def get_contracts_by_user(user_id: uuid.UUID, db: Session) -> list[dict]:
     contracts = (
         db.query(Contract, Client, Service)
         .filter(Contract.user_id == user_id)
@@ -81,10 +77,7 @@ def get_contracts_by_user(user_id: int, db: Session) -> list[dict]:
     return clients_services
 
 
-def update_contract(
-    contract_id: int, user_id: int, db: Session, **kwargs
-) -> Contract | None:
-
+def update_contract(contract_id: uuid.UUID, user_id: uuid.UUID, db: Session, **kwargs) -> Contract | None:
     contract = (
         db.query(Contract)
         .filter(Contract.id == contract_id, Contract.user_id == user_id)
@@ -99,10 +92,11 @@ def update_contract(
         db.commit()
         db.refresh(contract)
         return contract
+    
     return None
 
 
-def delete_contract(contract_id: int, user_id: int, db: Session) -> bool:
+def delete_contract(contract_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> bool:
     contract = (
         db.query(Contract)
         .filter(Contract.id == contract_id, Contract.user_id == user_id)
@@ -116,10 +110,7 @@ def delete_contract(contract_id: int, user_id: int, db: Session) -> bool:
     return False
 
 
-def toggle_contract_status(
-    contract_id: int, user_id: int, db: Session
-) -> Contract | None:
-
+def toggle_contract_status(contract_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> Contract | None:
     contract = (
         db.query(Contract)
         .filter(Contract.id == contract_id, Contract.user_id == user_id)

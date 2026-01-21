@@ -1,22 +1,22 @@
-from app.db.models import User, Service, Client, Supplier, Contract
+from app.db.models import Service
 from sqlalchemy.orm import Session
+
+import uuid
 
 
 def create_service(
     db: Session,
-    user_id: int,
+    user_id: uuid.UUID,
     name: str,
     cost: float,
     price: float,
     description: str,
     periodicity: str,
-    supplier_id: int | None = None,
     status: bool = True,
 ) -> Service:
 
     service = Service(
         user_id=user_id,
-        supplier_id=supplier_id,
         name=name,
         cost=cost,
         price=price,
@@ -24,13 +24,14 @@ def create_service(
         periodicity=periodicity,
         status=status,
     )
+
     db.add(service)
     db.commit()
     db.refresh(service)
     return service
 
 
-def get_service_by_id(service_id: int, user_id: int, db: Session) -> Service | None:
+def get_service_by_id(service_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> Service | None:
     return (
         db.query(Service)
         .filter(Service.id == service_id, Service.user_id == user_id)
@@ -38,7 +39,7 @@ def get_service_by_id(service_id: int, user_id: int, db: Session) -> Service | N
     )
 
 
-def get_service_by_name(name: str, user_id: int, db: Session) -> Service | None:
+def get_service_by_name(name: str, user_id: uuid.UUID, db: Session) -> Service | None:
     return (
         db.query(Service)
         .filter(Service.name == name, Service.user_id == user_id)
@@ -46,14 +47,11 @@ def get_service_by_name(name: str, user_id: int, db: Session) -> Service | None:
     )
 
 
-def get_services_by_user(user_id: int, db: Session) -> list[Service]:
+def get_services_by_user(user_id: uuid.UUID, db: Session) -> list[Service]:
     return db.query(Service).filter(Service.user_id == user_id).all()
 
 
-def update_service(
-    service_id: int, user_id: int, db: Session, **kwargs
-) -> Service | None:
-
+def update_service(service_id: uuid.UUID, user_id: uuid.UUID, db: Session, **kwargs) -> Service | None:
     service = (
         db.query(Service)
         .filter(Service.id == service_id, Service.user_id == user_id)
@@ -72,7 +70,7 @@ def update_service(
     return service
 
 
-def delete_service(service_id: int, user_id: int, db: Session) -> bool:
+def delete_service(service_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> bool:
     service = (
         db.query(Service)
         .filter(Service.id == service_id, Service.user_id == user_id)
@@ -87,7 +85,7 @@ def delete_service(service_id: int, user_id: int, db: Session) -> bool:
     return True
 
 
-def toggle_service_status(service_id: int, user_id: int, db: Session) -> Service | None:
+def toggle_service_status(service_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> Service | None:
     service = (
         db.query(Service)
         .filter(Service.id == service_id, Service.user_id == user_id)

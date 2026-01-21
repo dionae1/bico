@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from app.db.models import User
 from app.services import user as user_service
 from app.schemas.user import ResponseUser, CreateUserRequest, UpdateUserRequest
 from app.core.auth import get_current_user
 from app.db.session import get_db
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+import uuid
+
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -35,7 +38,7 @@ def get_user_me(current_user: User = Depends(get_current_user)) -> ResponseUser:
     "/{user_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_user(
-    user_id: int,
+    user_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> None:
@@ -49,7 +52,7 @@ def delete_user(
 
 @router.put("/{user_id}", response_model=ResponseUser, status_code=status.HTTP_200_OK)
 def update_user(
-    user_id: int,
+    user_id: uuid.UUID,
     user: UpdateUserRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),

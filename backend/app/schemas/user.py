@@ -1,10 +1,11 @@
-from pydantic import BaseModel
-
 from app.models.user import User
+
+from pydantic import BaseModel
+import uuid
 
 
 class ResponseUser(BaseModel):
-    id: int
+    id: uuid.UUID
     email: str
     name: str
 

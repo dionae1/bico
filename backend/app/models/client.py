@@ -1,15 +1,16 @@
+from app.db.base import Base
+
 from datetime import datetime
 from sqlalchemy import DateTime, String, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.db.base import Base
+import uuid
 
 
 class Client(Base):
     __tablename__ = "clients"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, index=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
         index=True,
         server_default="0",

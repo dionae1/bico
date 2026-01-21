@@ -3,7 +3,10 @@ from sqlalchemy.orm import Session
 
 from app.core.utils import get_number_or_default
 
-def revenue_data(user_id: int, db: Session):
+import uuid
+
+
+def revenue_data(user_id: uuid.UUID, db: Session):
     query = text(
         """
         SELECT 
@@ -42,7 +45,7 @@ def revenue_data(user_id: int, db: Session):
     }
 
 
-def revenue_history(user_id: int, db: Session):
+def revenue_history(user_id: uuid.UUID, db: Session):
     query = text(
         """
         SELECT 
@@ -76,7 +79,7 @@ def revenue_history(user_id: int, db: Session):
     return history
 
 
-def clients_data(user_id: int, db: Session):
+def clients_data(user_id: uuid.UUID, db: Session):
     clients_query = text(
         """
         SELECT 
@@ -120,16 +123,35 @@ def clients_data(user_id: int, db: Session):
         most_valuable_query, {"user_id": user_id}
     ).fetchone()
 
-    new_clients = get_number_or_default(clients_results.monthly_new_clients) if clients_results else 0
-    total_clients = get_number_or_default(clients_results.total_clients) if clients_results else 0
-
-    new_clients_percentage: float = (
-        ((new_clients / (total_clients - new_clients) * 100) if (total_clients - new_clients) > 0 else 100)
-        if clients_results else 0
+    new_clients = (
+        get_number_or_default(clients_results.monthly_new_clients)
+        if clients_results
+        else 0
+    )
+    total_clients = (
+        get_number_or_default(clients_results.total_clients) if clients_results else 0
     )
 
-    with_contracts = get_number_or_default(clients_results.clients_with_contracts) if clients_results else 0
-    without_contracts = get_number_or_default(clients_results.clients_without_contracts) if clients_results else 0
+    new_clients_percentage: float = (
+        (
+            (new_clients / (total_clients - new_clients) * 100)
+            if (total_clients - new_clients) > 0
+            else 100
+        )
+        if clients_results
+        else 0
+    )
+
+    with_contracts = (
+        get_number_or_default(clients_results.clients_with_contracts)
+        if clients_results
+        else 0
+    )
+    without_contracts = (
+        get_number_or_default(clients_results.clients_without_contracts)
+        if clients_results
+        else 0
+    )
 
     return {
         "total_clients": total_clients,
@@ -142,7 +164,7 @@ def clients_data(user_id: int, db: Session):
     }
 
 
-def clients_history(user_id: int, db: Session):
+def clients_history(user_id: uuid.UUID, db: Session):
     query = text(
         """
         SELECT 
@@ -171,7 +193,7 @@ def clients_history(user_id: int, db: Session):
     return history
 
 
-def top_clients(user_id: int, db: Session, limit: int = 5):
+def top_clients(user_id: uuid.UUID, db: Session, limit: int = 5):
     query = text(
         """
         SELECT
@@ -203,7 +225,7 @@ def top_clients(user_id: int, db: Session, limit: int = 5):
     ]
 
 
-def contracts_data(user_id: int, db: Session, limit: int = 3):
+def contracts_data(user_id: uuid.UUID, db: Session, limit: int = 3):
     query = text(
         """
         SELECT 
@@ -220,12 +242,23 @@ def contracts_data(user_id: int, db: Session, limit: int = 3):
     results = db.execute(query, {"user_id": user_id}).fetchone()
 
     total_contracts = get_number_or_default(results.total_contracts) if results else 0
-    new_contracts = get_number_or_default(results.monthly_new_contracts) if results else 0
+    new_contracts = (
+        get_number_or_default(results.monthly_new_contracts) if results else 0
+    )
 
     new_contracts_percentage: float = (
-        ((new_contracts / (total_contracts - new_contracts) * 100) if (total_contracts - new_contracts) > 0 else 100)
-        if results else 0
-    ) if total_contracts > 0 else 0
+        (
+            (
+                (new_contracts / (total_contracts - new_contracts) * 100)
+                if (total_contracts - new_contracts) > 0
+                else 100
+            )
+            if results
+            else 0
+        )
+        if total_contracts > 0
+        else 0
+    )
 
     most_profitable_query = text(
         """
@@ -274,10 +307,18 @@ def contracts_data(user_id: int, db: Session, limit: int = 3):
     )
 
     active_contracts = get_number_or_default(results.active_contracts) if results else 0
-    inactive_contracts = get_number_or_default(results.inactive_contracts) if results else 0
-    monthly_new_contracts = get_number_or_default(results.monthly_new_contracts) if results else 0
-    end_this_month_contracts = get_number_or_default(results.end_this_month_contracts) if results else 0
-    finished_contracts = get_number_or_default(results.finished_contracts) if results else 0
+    inactive_contracts = (
+        get_number_or_default(results.inactive_contracts) if results else 0
+    )
+    monthly_new_contracts = (
+        get_number_or_default(results.monthly_new_contracts) if results else 0
+    )
+    end_this_month_contracts = (
+        get_number_or_default(results.end_this_month_contracts) if results else 0
+    )
+    finished_contracts = (
+        get_number_or_default(results.finished_contracts) if results else 0
+    )
 
     return {
         "total_contracts": total_contracts,
@@ -292,7 +333,7 @@ def contracts_data(user_id: int, db: Session, limit: int = 3):
     }
 
 
-def contracts_history(user_id: int, db: Session):
+def contracts_history(user_id: uuid.UUID, db: Session):
     query = text(
         """
         SELECT 
@@ -322,7 +363,7 @@ def contracts_history(user_id: int, db: Session):
     return history
 
 
-def services_data(user_id: int, db: Session):
+def services_data(user_id: uuid.UUID, db: Session):
     query = text(
         """
         SELECT 
@@ -399,7 +440,7 @@ def services_data(user_id: int, db: Session):
     }
 
 
-def top_services(user_id: int, db: Session, limit: int = 5):
+def top_services(user_id: uuid.UUID, db: Session, limit: int = 5):
     query = text(
         """
         SELECT
@@ -461,7 +502,7 @@ def top_services(user_id: int, db: Session, limit: int = 5):
     ]
 
 
-def overview(user_id: int, db: Session):
+def overview(user_id: uuid.UUID, db: Session):
     return {
         "revenue": revenue_data(user_id=user_id, db=db),
         "clients": clients_data(user_id=user_id, db=db),

@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.auth import get_current_user
 from app.models.user import User
 from app.schemas.client import CreateClientRequest, ResponseClient, UpdateClientRequest
 from app.services import client as client_service
+from app.db.session import get_db
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from app.db.session import get_db
+import uuid
+
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -57,7 +60,6 @@ def create_client(
 def get_all_clients(
     current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> list[ResponseClient]:
-
     clients = client_service.get_client_by_user(user_id=current_user.id, db=db)
     if not clients:
         raise HTTPException(
@@ -69,14 +71,15 @@ def get_all_clients(
 
 
 @router.get(
-    "/{client_id}", response_model=ResponseClient, status_code=status.HTTP_200_OK
+    "/{client_id}",
+    response_model=ResponseClient,
+    status_code=status.HTTP_200_OK,
 )
 def get_client_by_id(
-    client_id: int,
+    client_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ResponseClient:
-
     client = client_service.get_client_by_id(
         client_id=client_id, user_id=current_user.id, db=db
     )
@@ -110,10 +113,12 @@ def get_client_by_email(
 
 
 @router.put(
-    "/{client_id}", response_model=ResponseClient, status_code=status.HTTP_200_OK
+    "/{client_id}",
+    response_model=ResponseClient,
+    status_code=status.HTTP_200_OK,
 )
 def update_client(
-    client_id: int,
+    client_id: uuid.UUID,
     client: UpdateClientRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -141,7 +146,7 @@ def update_client(
     status_code=status.HTTP_200_OK,
 )
 def toggle_client_status(
-    client_id: int,
+    client_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ResponseClient:
@@ -159,10 +164,12 @@ def toggle_client_status(
 
 
 @router.delete(
-    "/{client_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
+    "/{client_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_client(
-    client_id: int,
+    client_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> None:

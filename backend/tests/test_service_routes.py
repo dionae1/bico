@@ -1,6 +1,7 @@
-from fastapi import status
-from conftest import URL_PREFIX
 from factories.service import ServiceFactory
+from conftest import URL_PREFIX
+from fastapi import status
+import uuid
 
 
 def test_create_service(client_user):
@@ -48,7 +49,7 @@ def test_get_service_by_id(client_user):
 
 
 def test_get_service_by_invalid_id(client_user):
-    response = client_user.get(f"{URL_PREFIX}/services/999999")
+    response = client_user.get(f"{URL_PREFIX}/services/{uuid.uuid4()}")
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
