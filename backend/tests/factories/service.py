@@ -1,5 +1,6 @@
-import factory
 from app.models.service import Service
+
+import factory
 
 
 class ServiceFactory(factory.alchemy.SQLAlchemyModelFactory):

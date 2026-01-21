@@ -1,15 +1,15 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from datetime import datetime, timedelta, timezone
-import jwt
-
 from app.core.config import settings
 from app.services import user as user_service
 from app.db.session import get_db
 from app.models.user import User
-from sqlalchemy.orm import Session
 
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from datetime import datetime, timedelta, timezone
+from sqlalchemy.orm import Session
 import bcrypt
+import uuid
+import jwt
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
@@ -18,7 +18,9 @@ ALGORITHM = settings.ALGORITHM
 
 
 def hash_password(password: str) -> str:
-    password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode(
+        "utf-8"
+    )
     return password_hash
 
 
@@ -65,7 +67,7 @@ def get_current_user(
         if user_id_str is None:
             raise CredentialsException()
 
-        user_id = int(user_id_str)
+        user_id = uuid.UUID(user_id_str)
 
     except jwt.exceptions.PyJWTError:
         raise CredentialsException()

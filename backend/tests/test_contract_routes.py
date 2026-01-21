@@ -6,7 +6,7 @@ from factories.client import ClientFactory
 
 
 def test_create_contract(client_user):
-    client = ClientFactory()
+    client = ClientFactory(user_id=client_user.user.id)
     contract = ContractFactory.build()
     service = ServiceFactory.build()
     service_response = client_user.post(
@@ -24,7 +24,7 @@ def test_create_contract(client_user):
     contract.service_id = service_response.json()["id"]
 
     payload = {
-        "client_id": contract.client_id,
+        "client_id": str(contract.client_id),
         "service_id": contract.service_id,
         "created_at": contract.created_at.isoformat(),
         "end_at": contract.end_at.isoformat(),
@@ -39,7 +39,7 @@ def test_create_contract(client_user):
 
 
 def test_get_contracts(client_user):
-    client = ClientFactory()
+    client = ClientFactory(user_id=client_user.user.id)
     contract = ContractFactory.build()
     service = ServiceFactory.build()
     service_response = client_user.post(
@@ -58,7 +58,7 @@ def test_get_contracts(client_user):
     client_user.post(
         f"{URL_PREFIX}/contracts/",
         json={
-            "client_id": contract.client_id,
+            "client_id": str(contract.client_id),
             "service_id": contract.service_id,
             "created_at": contract.created_at.isoformat(),
             "end_at": contract.end_at.isoformat(),
@@ -76,7 +76,7 @@ def test_get_empty_contracts(client_user):
 
 
 def test_get_contracts_by_id(client_user):
-    client = ClientFactory()
+    client = ClientFactory(user_id=client_user.user.id)
     contract = ContractFactory.build()
     service = ServiceFactory.build()
     service_response = client_user.post(
@@ -95,7 +95,7 @@ def test_get_contracts_by_id(client_user):
     client_user.post(
         f"{URL_PREFIX}/contracts/",
         json={
-            "client_id": contract.client_id,
+            "client_id": str(contract.client_id),
             "service_id": contract.service_id,
             "created_at": contract.created_at.isoformat(),
             "end_at": contract.end_at.isoformat(),
@@ -108,7 +108,7 @@ def test_get_contracts_by_id(client_user):
 
 
 def test_update_contract(client_user):
-    client = ClientFactory()
+    client = ClientFactory(user_id=client_user.user.id)
     contract = ContractFactory.build()
     service = ServiceFactory.build()
     service_response = client_user.post(
@@ -127,7 +127,7 @@ def test_update_contract(client_user):
     create_response = client_user.post(
         f"{URL_PREFIX}/contracts/",
         json={
-            "client_id": contract.client_id,
+            "client_id": str(contract.client_id),
             "service_id": contract.service_id,
             "created_at": contract.created_at.isoformat(),
             "end_at": contract.end_at.isoformat(),
@@ -153,7 +153,7 @@ def test_update_contract(client_user):
 
 
 def test_toggle_contract_status(client_user):
-    client = ClientFactory()
+    client = ClientFactory(user_id=client_user.user.id)
     contract = ContractFactory.build()
     service = ServiceFactory.build()
     service_response = client_user.post(
@@ -172,7 +172,7 @@ def test_toggle_contract_status(client_user):
     create_response = client_user.post(
         f"{URL_PREFIX}/contracts/",
         json={
-            "client_id": contract.client_id,
+            "client_id": str(contract.client_id),
             "service_id": contract.service_id,
             "created_at": contract.created_at.isoformat(),
             "end_at": contract.end_at.isoformat(),
@@ -191,7 +191,7 @@ def test_toggle_contract_status(client_user):
 
 
 def test_delete_contract(client_user):
-    client = ClientFactory()
+    client = ClientFactory(user_id=client_user.user.id)
     contract = ContractFactory.build()
     service = ServiceFactory.build()
     service_response = client_user.post(
@@ -210,7 +210,7 @@ def test_delete_contract(client_user):
     create_response = client_user.post(
         f"{URL_PREFIX}/contracts/",
         json={
-            "client_id": contract.client_id,
+            "client_id": str(contract.client_id),
             "service_id": contract.service_id,
             "created_at": contract.created_at.isoformat(),
             "end_at": contract.end_at.isoformat(),

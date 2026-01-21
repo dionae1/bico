@@ -1,16 +1,19 @@
-from app.db.models import User, Service, Client, Supplier, Contract
+from app.db.models import Client
 from sqlalchemy.orm import Session
+
+import uuid
 
 
 def create_client(
     db: Session,
-    user_id: int,
+    user_id: uuid.UUID,
     name: str,
     email: str,
     phone: str,
     address: str,
     status: bool = True,
 ) -> Client:
+    
     client = Client(
         user_id=user_id,
         name=name,
@@ -25,7 +28,7 @@ def create_client(
     return client
 
 
-def get_client_by_id(client_id: int, user_id: int, db: Session) -> Client | None:
+def get_client_by_id(client_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> Client | None:
     return (
         db.query(Client)
         .filter(Client.id == client_id, Client.user_id == user_id)
@@ -33,11 +36,11 @@ def get_client_by_id(client_id: int, user_id: int, db: Session) -> Client | None
     )
 
 
-def get_client_by_name(name: str, user_id: int, db: Session) -> list[Client] | None:
+def get_client_by_name(name: str, user_id: uuid.UUID, db: Session) -> list[Client] | None:
     return db.query(Client).filter(Client.name == name, Client.user_id == user_id).all()
 
 
-def get_client_by_email(email: str, user_id: int, db: Session) -> Client | None:
+def get_client_by_email(email: str, user_id: uuid.UUID, db: Session) -> Client | None:
     return (
         db.query(Client)
         .filter(Client.email == email, Client.user_id == user_id)
@@ -45,12 +48,11 @@ def get_client_by_email(email: str, user_id: int, db: Session) -> Client | None:
     )
 
 
-def get_client_by_user(user_id: int, db: Session) -> list[Client]:
+def get_client_by_user(user_id: uuid.UUID, db: Session) -> list[Client]:
     return db.query(Client).filter(Client.user_id == user_id).all()
 
 
-def update_client(client_id: int, user_id: int, db: Session, **kwargs) -> Client | None:
-
+def update_client(client_id: uuid.UUID, user_id: uuid.UUID, db: Session, **kwargs) -> Client | None:
     client = (
         db.query(Client)
         .filter(Client.id == client_id, Client.user_id == user_id)
@@ -69,8 +71,7 @@ def update_client(client_id: int, user_id: int, db: Session, **kwargs) -> Client
     return client
 
 
-def delete_client(client_id: int, user_id: int, db: Session) -> bool:
-
+def delete_client(client_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> bool:
     client = (
         db.query(Client)
         .filter(Client.id == client_id, Client.user_id == user_id)
@@ -84,13 +85,13 @@ def delete_client(client_id: int, user_id: int, db: Session) -> bool:
     return True
 
 
-def toggle_client_status(client_id: int, user_id: int, db: Session) -> Client | None:
-
+def toggle_client_status(client_id: uuid.UUID, user_id: uuid.UUID, db: Session) -> Client | None:
     client = (
         db.query(Client)
         .filter(Client.id == client_id, Client.user_id == user_id)
         .first()
     )
+
     if not client:
         return None
 

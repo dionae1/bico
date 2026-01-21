@@ -1,18 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from app.db.models import Contract
-from app.models.user import User
-from app.services import contract as contract_service
-from app.core.auth import get_current_user
-from app.db.session import get_db
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
-
 from app.schemas.contract import (
     CompleteResponseContract,
     ResponseContract,
     CreateContract,
     UpdateContract,
 )
+
+from app.models.user import User
+from app.services import contract as contract_service
+from app.core.auth import get_current_user
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from app.db.session import get_db
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+import uuid
+
 
 router = APIRouter(prefix="/contracts", tags=["contracts"])
 
@@ -88,7 +90,7 @@ def get_contracts(
     status_code=status.HTTP_200_OK,
 )
 def get_contracts_by_client(
-    client_id: int,
+    client_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[CompleteResponseContract]:
@@ -116,7 +118,7 @@ def get_contracts_by_client(
     status_code=status.HTTP_200_OK,
 )
 def get_contract(
-    contract_id: int,
+    contract_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CompleteResponseContract:
@@ -135,10 +137,12 @@ def get_contract(
 
 
 @router.delete(
-    "/{contract_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
+    "/{contract_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_contract(
-    contract_id: int,
+    contract_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> None:
@@ -154,10 +158,12 @@ def delete_contract(
 
 
 @router.put(
-    "/{contract_id}", response_model=ResponseContract, status_code=status.HTTP_200_OK
+    "/{contract_id}",
+    response_model=ResponseContract,
+    status_code=status.HTTP_200_OK,
 )
 def update_contract(
-    contract_id: int,
+    contract_id: uuid.UUID,
     contract: UpdateContract,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -183,7 +189,7 @@ def update_contract(
     status_code=status.HTTP_200_OK,
 )
 def toggle_contract_status(
-    contract_id: int,
+    contract_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ResponseContract:

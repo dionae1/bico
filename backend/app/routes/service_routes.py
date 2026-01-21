@@ -1,16 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
-from app.models.user import User
-from app.services import service as services_
-from app.core.auth import get_current_user
-from app.db.session import get_db
-
 from app.schemas.service import (
     ResponseService,
     CreateServiceRequest,
     UpdateServiceRequest,
 )
+
+from app.models.user import User
+from app.services import service as services_
+from app.core.auth import get_current_user
+from app.db.session import get_db
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+import uuid
+
 
 router = APIRouter(prefix="/services", tags=["services"])
 
@@ -29,9 +32,9 @@ def create_service(
         price=service.price,
         cost=service.cost,
         periodicity=service.periodicity,
-        supplier_id=service.supplier_id,
         db=db,
     )
+
     if not created_service:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Service creation failed"
@@ -57,10 +60,12 @@ def get_services(
 
 
 @router.get(
-    "/{service_id}", response_model=ResponseService, status_code=status.HTTP_200_OK
+    "/{service_id}",
+    response_model=ResponseService,
+    status_code=status.HTTP_200_OK,
 )
 def get_service(
-    service_id: int,
+    service_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ResponseService:
@@ -78,10 +83,12 @@ def get_service(
 
 
 @router.put(
-    "/{service_id}", response_model=ResponseService, status_code=status.HTTP_200_OK
+    "/{service_id}",
+    response_model=ResponseService,
+    status_code=status.HTTP_200_OK,
 )
 def update_service(
-    service_id: int,
+    service_id: uuid.UUID,
     service: UpdateServiceRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -108,7 +115,7 @@ def update_service(
     status_code=status.HTTP_200_OK,
 )
 def toggle_service_status(
-    service_id: int,
+    service_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ResponseService:
@@ -127,10 +134,12 @@ def toggle_service_status(
 
 
 @router.delete(
-    "/{service_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
+    "/{service_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_service(
-    service_id: int,
+    service_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> None:

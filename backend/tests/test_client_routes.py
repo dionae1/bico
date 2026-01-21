@@ -2,6 +2,7 @@ from fastapi import status
 from conftest import URL_PREFIX
 from factories.client import ClientFactory
 
+import uuid
 
 def test_create_client(client_user):
     client = ClientFactory.build()
@@ -78,7 +79,7 @@ def test_get_client_by_id(client_user):
 
 
 def test_get_client_by_id_not_found(client_user):
-    response = client_user.get(f"{URL_PREFIX}/clients/9999")
+    response = client_user.get(f"{URL_PREFIX}/clients/{uuid.uuid4()}")
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
@@ -101,7 +102,7 @@ def test_delete_client(client_user):
 
 
 def test_delete_client_not_found(client_user):
-    response = client_user.delete(f"{URL_PREFIX}/clients/9999")
+    response = client_user.delete(f"{URL_PREFIX}/clients/{uuid.uuid4()}")
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 

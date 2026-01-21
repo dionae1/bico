@@ -1,6 +1,3 @@
-from datetime import datetime
-from pydantic import BaseModel
-
 from app.models.contract import Contract
 from app.schemas.service import ResponseService
 from app.schemas.client import ResponseClient
@@ -8,12 +5,16 @@ from app.schemas.client import ResponseClient
 from app.models.client import Client
 from app.models.service import Service
 
+from datetime import datetime
+from pydantic import BaseModel
+import uuid
+
 
 class ResponseContract(BaseModel):
-    id: int
-    user_id: int
-    client_id: int
-    service_id: int
+    id: uuid.UUID
+    user_id: uuid.UUID
+    client_id: uuid.UUID
+    service_id: uuid.UUID
     created_at: datetime
     end_at: datetime
     value: float
@@ -34,8 +35,8 @@ class ResponseContract(BaseModel):
 
 
 class CompleteResponseContract(BaseModel):
-    id: int
-    user_id: int
+    id: uuid.UUID
+    user_id: uuid.UUID
     created_at: datetime
     end_at: datetime
     value: float
@@ -60,8 +61,8 @@ class CompleteResponseContract(BaseModel):
 
 
 class CreateContract(BaseModel):
-    client_id: int
-    service_id: int
+    client_id: uuid.UUID
+    service_id: uuid.UUID
     created_at: datetime
     end_at: datetime
     value: float
