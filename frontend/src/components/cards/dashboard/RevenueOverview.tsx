@@ -1,4 +1,6 @@
 import MultipleItemsDashboardBase from "./MultipleItemsDashboardBase";
+import { formatPrice } from "../../../services/util";
+
 
 interface RevenueOverviewProps {
     total_revenue: number;
@@ -12,9 +14,9 @@ function RevenueOverview({ data, title = "Revenue" }: { data: RevenueOverviewPro
     return (
         <MultipleItemsDashboardBase
             dataMap={[
-                ["Costs", `$${data.total_cost.toFixed(2)}`],
-                ["Expected", `$${data.total_expected_revenue.toFixed(2)}`],
-                ["Earnings", `$${data.total_revenue.toFixed(2)}`],
+                ["Costs", `$${formatPrice(data.total_cost)}`],
+                ["Expected", `$${formatPrice(data.total_expected_revenue)}`],
+                ["Earnings", `$${formatPrice(data.total_revenue)}`],
             ]}
             title={title}
             percentage={data.profit_margin}

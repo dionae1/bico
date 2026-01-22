@@ -10,6 +10,7 @@ import { Client } from "@/types/Client";
 
 import api from "../../api/client";
 import { AxiosError } from "axios";
+import { formatPrice } from "../../services/util";
 
 function ContractForm({ onCreated }: { onCreated?: () => void }) {
     const [clientId, setClientId] = useState("");
@@ -132,7 +133,7 @@ function ContractForm({ onCreated }: { onCreated?: () => void }) {
                         setServiceId(e.target.value)
                         const selectedService = services.find(s => s.id === parseInt(e.target.value));
                         if (selectedService) {
-                            setValue(selectedService.price.toFixed(2));
+                            setValue(formatPrice(selectedService.price));
                         }
                     }} className="mt-1 p-2 border border-gray-300 rounded w-full" required>
                         <option value="">Select a service</option>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-
 import HighlightField from "../HighlightField";
 import { Service } from "@/types/Service";
+import { formatPrice } from "../../services/util";
 
 interface ClientModalProps {
     isOpen: boolean;
@@ -33,10 +33,10 @@ function ServiceModal({ isOpen, onClose, service }: ClientModalProps) {
                 </div>
                 <div className="mt-2 px-4 py-6 space-y-4">
                     <h2 className="text-2xl font-semibold mb-6 text-center text-slate-800">{service.name}</h2>
-                    <HighlightField legend="Description" text={service.description} />
-                    <HighlightField legend="Cost" text={"$".concat(service.cost.toFixed(2).toString())} />
-                    <HighlightField legend="Price" text={"$".concat(service.price.toFixed(2).toString())} />
-                    <HighlightField legend="Periodicity" text={service.periodicity} />
+                    <HighlightField legend="Description" text={service?.description ? service.description : ""} />
+                    <HighlightField legend="Cost" text={service.cost ? "$".concat(formatPrice(service.cost)) : ""} />
+                    <HighlightField legend="Price" text={"$".concat(formatPrice(service.price))} />
+                    <HighlightField legend="Periodicity" text={service?.periodicity} />
                 </div>
             </div>
         </div>

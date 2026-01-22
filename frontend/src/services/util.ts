@@ -21,4 +21,8 @@ function isValidName(name: string): boolean {
     return name.trim().length > 8 && name.length <= 50 && /^[a-zA-Z\s]+$/.test(name);
 }
 
-export { capitalize, formatPhoneNumber, isValidEmail, isValidPassword, isValidName };
+function formatPrice(price: number | string): string {
+    return Number(price).toFixed(2);
+}
+
+export { capitalize, formatPhoneNumber, isValidEmail, isValidPassword, isValidName, formatPrice };

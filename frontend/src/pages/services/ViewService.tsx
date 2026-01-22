@@ -5,6 +5,7 @@ import Loading from "../../components/Loading";
 import BackButton from "../../components/buttons/BackButton";
 import FormButton from "../../components/buttons/FormButton";
 import FormInput from "../../components/FormInput";
+import { formatPrice } from "../../services/util";
 
 import api from "../../api/client";
 import { AxiosError } from "axios";
@@ -100,7 +101,7 @@ function ViewService() {
                         id="servicePrice"
                         label="Price"
                         type="number"
-                        value={servicePrice}
+                        value={Number(formatPrice(servicePrice))}
                         onChange={(e) => setServicePrice(e.target.value)}
                         required
                     />
@@ -108,7 +109,7 @@ function ViewService() {
                         id="serviceCost"
                         label="Cost"
                         type="number"
-                        value={serviceCost}
+                        value={Number(formatPrice(serviceCost))}
                         onChange={(e) => setServiceCost(e.target.value)}
                         required
                     />

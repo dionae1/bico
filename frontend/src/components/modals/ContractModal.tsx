@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import { formatPrice } from "../../services/util";
 import { Contract } from "@/types/Contract";
 import HighlightField from "../HighlightField";
 
@@ -38,7 +38,7 @@ function ContractModal({ isOpen, onClose, contract }: ContractModalProps) {
                     <h3 className="text-lg font-medium text-slate-700 border-b border-slate-100 pb-1 mt-4">Service</h3>
                     <HighlightField legend="Name" text={contract.service.name} />
                     <HighlightField legend="Description" text={contract.service.description || ""} />
-                    <HighlightField legend="Value" text={`U$ ${contract.value.toFixed(2)}`} />
+                    <HighlightField legend="Value" text={`U$ ${formatPrice(contract.value)}`} />
                     <HighlightField legend="End Date" text={new Date(contract.end_at).toLocaleDateString()} />
                 </div>
             </div>

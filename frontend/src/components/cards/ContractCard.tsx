@@ -1,7 +1,7 @@
 import { FaEdit } from "react-icons/fa";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-
+import { formatPrice } from "../../services/util";
 import { Contract } from "@/types/Contract";
 
 interface ContractCardProps {
@@ -25,7 +25,7 @@ function ContractCard({ contract, onDelete, onHighlight }: ContractCardProps) {
             </td>
             <td className="px-6 py-4 text-slate-600">{contract.service?.name}</td>
             <td className="px-6 py-4 text-slate-600">{new Date(contract.end_at).toLocaleDateString()}</td>
-            <td className="px-6 py-4 text-slate-600 font-medium">U$ {contract.value.toFixed(2)}</td>
+            <td className="px-6 py-4 text-slate-600 font-medium">U$ {formatPrice(contract.value)}</td>
             <td className="px-6 py-4 text-right">
                 <div className="flex justify-end gap-2">
                     <button

@@ -3,6 +3,7 @@ import { FaDeleteLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
 import { Service } from "@/types/Service";
+import { formatPrice } from "../../services/util";
 
 interface ServiceCardProps {
     service: Service;
@@ -23,8 +24,8 @@ function ServiceCard({ service, onDelete, onHighlight }: ServiceCardProps) {
                     {service.name}
                 </button>
             </td>
-            <td className="px-6 py-4 text-slate-600">U$ {service.price.toFixed(2)}</td>
-            <td className="px-6 py-4 text-slate-600">U$ {service.cost.toFixed(2)}</td>
+            <td className="px-6 py-4 text-slate-600">U$ {formatPrice(service.price)}</td>
+            <td className="px-6 py-4 text-slate-600"> { service.cost ? `U$ ${formatPrice(service.cost)}` : ""}</td>
             <td className="px-6 py-4 text-right">
                 <div className="flex justify-end gap-2">
                     <button
