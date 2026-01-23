@@ -19,7 +19,9 @@ def create_user(
     db: Session = Depends(get_db),
 ) -> ResponseUser:
 
-    created_user = user_service.create_user(user.email, user.name, user.password, db=db)
+    created_user = user_service.create_user(
+        db=db, email=user.email, name=user.name, password=user.password
+    )
 
     if not created_user:
         raise HTTPException(status_code=400, detail="User creation failed")

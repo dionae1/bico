@@ -17,6 +17,7 @@ from factories.user import UserFactory
 from factories.client import ClientFactory
 from factories.service import ServiceFactory
 from factories.contract import ContractFactory
+from factories.auth_credentials import AuthCredentialsFactory
 
 URL_PREFIX = "/api/v1"
 TEST_DB_URL = "sqlite:///:memory:"
@@ -69,3 +70,4 @@ def set_session_for_factories(test_db):
     setattr(ClientFactory._meta, "sqlalchemy_session", test_db)
     setattr(ServiceFactory._meta, "sqlalchemy_session", test_db)
     setattr(ContractFactory._meta, "sqlalchemy_session", test_db)
+    setattr(AuthCredentialsFactory._meta, "sqlalchemy_session", test_db)
