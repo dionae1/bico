@@ -2,13 +2,85 @@ from app.services import user as user_service
 from app.schemas.user import ResponseUser, CreateUserRequest, LoginUserRequest
 from app.core import auth
 from app.db.session import get_db
+from app.core.config import settings
 
 from fastapi import APIRouter, HTTPException, Request, Depends, Response, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+@router.get("/generate-url")
+async def generate_oauth_url():
+    oauth_url = settings.REDIRECT_URI
+    return {"oauth_url": oauth_url}
+
+
+@router.get("/oauth/google/callback")
+async def google_oauth_callback(code: str, state: str, db: Session = Depends(get_db)):
+    try:
+        token_response = await auth.exchange_code_for_token(
+            code=code,
+            google_client_id=settings.GOOGLE_CLIENT_ID,
+            google_client_secret=settings.GOOGLE_CLIENT_SECRET,
+            google_redirect_uri=settings.GOOGLE_CALLBACK_URI,
+        )
+
+        id_token = token_response.get("id_token")
+        if not id_token:
+            return RedirectResponse(
+                url=f"{settings.FRONTEND_URL}/auth/callback?error=no_token"
+            )
+
+        external_user_info = auth.verify_google_id_token(
+            id_token_str=id_token,
+            google_client_id=settings.GOOGLE_CLIENT_ID,
+        )
+
+        name = external_user_info.get("name")
+        email = external_user_info.get("email")
+        provider_user_id = external_user_info.get("sub")
+        if not name or not email or not provider_user_id:
+            return RedirectResponse(
+                url=f"{settings.FRONTEND_URL}/auth/callback?error=incomplete_info"
+            )
+
+        user = auth.get_user_from_google_token(
+            name=name,
+            email=email,
+            provider_user_id=provider_user_id,
+            db=db,
+        )
+
+        if not user:
+            return RedirectResponse(
+                url=f"{settings.FRONTEND_URL}/auth/callback?error=user_creation_failed"
+            )
+
+        access_token = auth.create_access_token(data={"sub": str(user.id)})
+        refresh_token = auth.create_refresh_token(data={"sub": str(user.id)})
+
+        redirect_url = f"{settings.FRONTEND_URL}/auth/callback?token={access_token}"
+        response = RedirectResponse(url=redirect_url)
+        
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=settings.COOKIE_SECURE,
+            samesite="lax",
+            max_age=24 * 60 * 60 * 7,
+            path="/",
+        )
+
+        return response
+    
+    except Exception as e:
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/auth/callback?error=authentication_failed"
+        )
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
@@ -33,7 +105,7 @@ def login(response: Response, user_in: LoginUserRequest, db: Session = Depends(g
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False,
+        secure=settings.COOKIE_SECURE,
         samesite="lax",
         max_age=24 * 60 * 60 * 7,
         path="/",
@@ -48,7 +120,7 @@ def logout(response: Response):
         key="refresh_token",
         path="/",
         httponly=True,
-        secure=False,
+        secure=settings.COOKIE_SECURE,
         samesite="lax",
     )
     return {"detail": "Successfully logged out"}
@@ -63,7 +135,7 @@ def register(user_in: CreateUserRequest, db: Session = Depends(get_db)) -> Respo
         )
 
     user = user_service.create_user(
-        user_in.email, user_in.name, user_in.password, db=db
+        email=user_in.email, name=user_in.name, password=user_in.password, db=db
     )
     response = ResponseUser.from_model(user)
 
@@ -110,7 +182,7 @@ def refresh_token(request: Request, response: Response, db: Session = Depends(ge
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False,
+        secure=settings.COOKIE_SECURE,
         samesite="lax",
         max_age=24 * 60 * 60 * 7,
         path="/",

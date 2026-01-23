@@ -21,7 +21,7 @@ export const refreshToken = async () => {
         if (data.access_token) {
             localStorage.setItem('token', data.access_token);
         }
-        
+
         return data;
     } catch (error) {
         throw error;
@@ -44,3 +44,13 @@ export const logout = () => {
         console.error("Logout failed:", error);
     });
 };
+
+export const googleURI = async () => {
+    try {
+        const response = await api.get('/auth/generate-url');
+        return response.data.oauth_url;
+    } catch (error) {
+        console.error("Google login URL generation failed:", error);
+        throw error;
+    }
+}; 

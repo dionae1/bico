@@ -7,9 +7,13 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
+from google.oauth2 import id_token
+from google.auth.transport import requests
 import bcrypt
+import httpx
 import uuid
 import jwt
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
@@ -77,6 +81,49 @@ def get_current_user(
     if user is None:
         raise CredentialsException()
 
+    return user
+
+
+async def exchange_code_for_token(
+    code: str,
+    google_client_id: str,
+    google_client_secret: str,
+    google_redirect_uri: str,
+) -> dict:
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "code": code,
+        "client_id": google_client_id,
+        "client_secret": google_client_secret,
+        "redirect_uri": google_redirect_uri,
+        "grant_type": "authorization_code",
+    }
+
+    async with httpx.AsyncClient() as client:
+        token_response = await client.post(token_url, data=token_data)
+        token_response.raise_for_status()
+        return token_response.json()
+
+
+def verify_google_id_token(id_token_str: str, google_client_id: str):
+    return id_token.verify_oauth2_token(
+        id_token_str, requests.Request(), google_client_id
+    )
+
+
+def get_user_from_google_token(name: str, email: str, provider_user_id: str, db: Session) -> User | None:
+    user = user_service.get_user_by_email(email, db=db)
+    if user:
+        return user
+    
+    user = user_service.create_user(
+        db=db,
+        email=email,
+        name=name,
+        provider="google",
+        provider_user_id=provider_user_id,
+    )
+    
     return user
 
 

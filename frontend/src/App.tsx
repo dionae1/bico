@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage'
 
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import AuthCallbackPage from './pages/AuthCallbackPage'
 
 import MainClient from './pages/client/MainClient'
 import CreateClient from './pages/client/CreateClient'
@@ -33,6 +34,7 @@ function App() {
         <Route path='*' element={<NotFoundPage />} />
         <Route path='login' element={<LoginPage />} />
         <Route path='signup' element={<SignupPage />} />
+        <Route path='auth/callback' element={<AuthCallbackPage />} />
 
         <Route path='/' element={<MainLayout />}>
 
