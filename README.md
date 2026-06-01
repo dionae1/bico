@@ -1,6 +1,5 @@
 # <center>BiCO - Freelancer Management System</center>
 
-### [Available at bicoapp.me](https://bicoapp.me)
 ### [Software Requirements Specification](https://docs.google.com/document/d/1iAtY6wLn97dUmmQTi_aexQPQCrwsd_uIaxCKWP_D_cY/edit?usp=sharing)
 
 ##
